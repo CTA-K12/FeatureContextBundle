@@ -1,7 +1,7 @@
 {
     "name": "mesd/feature-context-bundle",
     "license": "MIT",
-    "type": "project",
+    "type": "symfony-bundle",
     "description": "Feature Context bundle",
     "target-dir": "MESD/Behat/MinkBundle"
 }
