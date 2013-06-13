@@ -3,5 +3,8 @@
     "license": "MIT",
     "type": "symfony-bundle",
     "description": "Feature Context bundle",
+    "autoload": {
+        "psr-0": { "MESD\\Behat\\MinkBundle": "" }
+    },
     "target-dir": "MESD/Behat/MinkBundle"
 }
