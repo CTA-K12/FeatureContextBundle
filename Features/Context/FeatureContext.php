@@ -56,6 +56,38 @@ class FeatureContext extends MinkContext
 
     }
 
+    /**
+     * @When /^I click on select2 "([^"]*)"$/
+     */
+    public function iClickOnSelect2($field)
+    {
+        $this->getSession()->getPage()->find('css', 'div#' . $field . ' > a')->click();
+    }
+
+    /**
+     * @When /^I wait for select2 to populate$/
+     */
+    public function iWaitForSelect2ToPopulate()
+    {
+        $this->getSession()->wait(5000, "$('.select2-searching').length < 1");
+    }
+
+    /**
+     * @When /^I click on select2 item "([^"]*)"$/
+     */
+    public function iClickOnSelectItem($item)
+    {
+        $this->getSession()->getPage()->find('css', 'div.select2-result-label:contains(' . $item . ')')->click();
+    }
+
+    /**
+     * @When /^I wait (\d+) ms$/
+     */
+    public function iWait2ms($ms)
+    {
+        $this->getSession()->wait($ms);
+    }
+
 //
 // Place your definition and hook methods here:
 //
