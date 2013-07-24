@@ -88,6 +88,18 @@ class FeatureContext extends MinkContext
         $this->getSession()->wait($ms);
     }
 
+    /**
+     * @When /^I search for "(.+?)"$/
+     */
+    public function gridSearch($field)
+    {
+        $this->getSession()->getPage()->fillField(
+            $this->getSession()->getPage()->find('css', 'input.grid-filter-input-query-from')->getAttribute('id')
+            ,$field);
+        $this->getSession()->getPage()->find('css', 'input.grid-filter-input-query-from')->keyup(' ');
+
+    }
+
 //
 // Place your definition and hook methods here:
 //
