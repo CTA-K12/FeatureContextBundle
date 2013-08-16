@@ -102,22 +102,6 @@ class FeatureContext extends MinkContext
      */
     public function IDeselect2Multi($field)
     {
-        print_r("\n");
-        print_r("\n");
-        print_r("\n");
-        print_r(
-            get_class_methods(
-        $this->getSession()->getPage()->findLink('css', 'li:contains(' . $field. ') a')
-        )
-        );
-                print_r(
-            get_class(
-        $this->getSession()->getPage()->findLink('css', 'li:contains(' . $field. ') a')
-        )
-        );
-        print_r("\n");
-        print_r("\n");
-        print_r("\n");
         $link=$this->getSession()->getPage()->find(
             'xpath',
             $this->getSession()->getSelectorsHandler()->selectorToXpath('css', 'li:contains(' . $field. ') a')
@@ -125,33 +109,6 @@ class FeatureContext extends MinkContext
 
         $link->click();
     }
-
-
-
-    // public function iClickOnTheElementWithCSSSelector($cssSelector)
-    // {
-    //     $session = $this->getSession();
-    //     $element = $session->getPage()->find(
-    //         'xpath',
-    //         $session->getSelectorsHandler()->selectorToXpath('css', $cssSelector) // just changed xpath to css
-    //     );
-    //     if (null === $element) {
-    //         throw new \InvalidArgumentException(sprintf('Could not evaluate CSS Selector: "%s"', $cssSelector));
-    //     }
-
-    //     $element->click();
-
-    // }
-
-
-
-
-
-
-
-
-
-
 
     /**
      * @When /^I wait (\d+) ms$/
