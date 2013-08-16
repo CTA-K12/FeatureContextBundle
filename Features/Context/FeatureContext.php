@@ -65,6 +65,15 @@ class FeatureContext extends MinkContext
     }
 
     /**
+     * @When /^I click on select2Multi "([^"]*)"$/
+     */
+    public function IClickOnSelect2Multi($field)
+    {
+        $this->getSession()->getPage()->find('css', 'div#' . $field . ' > ul > li > input' )->click();
+    }
+
+
+    /**
      * @When /^I wait for select2 to populate$/
      */
     public function IWaitForSelect2ToPopulate()
@@ -79,6 +88,70 @@ class FeatureContext extends MinkContext
     {
         $this->getSession()->getPage()->find('css', 'div.select2-result-label:contains(' . $item . ')')->click();
     }
+
+    /**
+     * @When /^I click on select2Multi item "([^"]*)"$/
+     */
+    public function IClickOnSelectMultiItem($item)
+    {
+        $this->getSession()->getPage()->find('css', 'div.select2-result-label:contains(' . $item . ')')->click();
+    }
+
+    /**
+     * @When /^I deselect2Multi "([^"]*)"$/
+     */
+    public function IDeselect2Multi($field)
+    {
+        print_r("\n");
+        print_r("\n");
+        print_r("\n");
+        print_r(
+            get_class_methods(
+        $this->getSession()->getPage()->findLink('css', 'li:contains(' . $field. ') a')
+        )
+        );
+                print_r(
+            get_class(
+        $this->getSession()->getPage()->findLink('css', 'li:contains(' . $field. ') a')
+        )
+        );
+        print_r("\n");
+        print_r("\n");
+        print_r("\n");
+        $link=$this->getSession()->getPage()->find(
+            'xpath',
+            $this->getSession()->getSelectorsHandler()->selectorToXpath('css', 'li:contains(' . $field. ') a')
+        );
+
+        $link->click();
+    }
+
+
+
+    // public function iClickOnTheElementWithCSSSelector($cssSelector)
+    // {
+    //     $session = $this->getSession();
+    //     $element = $session->getPage()->find(
+    //         'xpath',
+    //         $session->getSelectorsHandler()->selectorToXpath('css', $cssSelector) // just changed xpath to css
+    //     );
+    //     if (null === $element) {
+    //         throw new \InvalidArgumentException(sprintf('Could not evaluate CSS Selector: "%s"', $cssSelector));
+    //     }
+
+    //     $element->click();
+
+    // }
+
+
+
+
+
+
+
+
+
+
 
     /**
      * @When /^I wait (\d+) ms$/
@@ -105,8 +178,7 @@ class FeatureContext extends MinkContext
      */
     public function IWaitForGridSearchToFinish()
     {
-        var_dump('Waiting');
-        $this->getSession()->wait(5000, "$('span.filtered').val() != $('span.total').val()");
+        $this->getSession()->wait(5000, "$('span.filtered').text() != $('span.total').text()");
     }
 
 //
