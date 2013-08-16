@@ -51,7 +51,7 @@ class FeatureContext extends MinkContext
     /**
      * @Given /^I do nothing$/
      */
-    public function iDoNothing()
+    public function IDoNothing()
     {
 
     }
@@ -59,7 +59,7 @@ class FeatureContext extends MinkContext
     /**
      * @When /^I click on select2 "([^"]*)"$/
      */
-    public function iClickOnSelect2($field)
+    public function IClickOnSelect2($field)
     {
         $this->getSession()->getPage()->find('css', 'div#' . $field . ' > a')->click();
     }
@@ -67,7 +67,7 @@ class FeatureContext extends MinkContext
     /**
      * @When /^I wait for select2 to populate$/
      */
-    public function iWaitForSelect2ToPopulate()
+    public function IWaitForSelect2ToPopulate()
     {
         $this->getSession()->wait(5000, "$('.select2-searching').length < 1");
     }
@@ -75,7 +75,7 @@ class FeatureContext extends MinkContext
     /**
      * @When /^I click on select2 item "([^"]*)"$/
      */
-    public function iClickOnSelectItem($item)
+    public function IClickOnSelectItem($item)
     {
         $this->getSession()->getPage()->find('css', 'div.select2-result-label:contains(' . $item . ')')->click();
     }
@@ -83,13 +83,13 @@ class FeatureContext extends MinkContext
     /**
      * @When /^I wait (\d+) ms$/
      */
-    public function iWait2ms($ms)
+    public function IWait($ms)
     {
         $this->getSession()->wait($ms);
     }
 
     /**
-     * @When /^I search for "(.+?)"$/
+     * @When /^I grid search for "(.+?)"$/
      */
     public function gridSearch($field)
     {
@@ -98,6 +98,15 @@ class FeatureContext extends MinkContext
             ,$field);
         $this->getSession()->getPage()->find('css', 'input.grid-filter-input-query-from')->keyup(' ');
 
+    }
+
+        /**
+     * @When /^I wait for grid search to finish$/
+     */
+    public function IWaitForGridSearchToFinish()
+    {
+        var_dump('Waiting');
+        $this->getSession()->wait(5000, "$('span.filtered').val() != $('span.total').val()");
     }
 
 //
