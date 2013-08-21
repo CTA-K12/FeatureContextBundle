@@ -148,9 +148,20 @@ class FeatureContext extends MinkContext
         $date = $this->getSession()->getPage()->find('css', '.calendar-date');
         if ($date->getText() != $currentMonth) {
             throw new \Exception(
-                "The date for the calendar is not the current date"
+                'The date for the calendar is not the current date'
             );
         }
+    }
+
+    /**
+     *  @When /^I click on the middle of the month$/
+     */
+    public function IClickOnTheMiddleOfTheMonth()
+    {
+        $today = new \DateTime();
+        $ymd = $today->format('Y-m-') . '15';
+        $day = $this->getSession()->getPage()->find('css', '#calendar-day-items-' . $ymd);
+        $day->click();
     }
 
 //
