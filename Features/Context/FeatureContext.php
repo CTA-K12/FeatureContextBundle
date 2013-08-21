@@ -164,6 +164,17 @@ class FeatureContext extends MinkContext
         $day->click();
     }
 
+    /**
+     *  @When /^I click on visibility boxes$/
+     */
+    public function IClickOnVisibilityBoxes()
+    {
+        $boxes = $this->getSession()->getPage()->findAll('css', '.visible-box');
+        foreach ($boxes as $box) {
+            $box->click();
+        }
+    }
+
 //
 // Place your definition and hook methods here:
 //
