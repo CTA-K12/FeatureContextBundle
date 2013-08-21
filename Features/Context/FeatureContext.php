@@ -161,7 +161,12 @@ class FeatureContext extends MinkContext
         $today = new \DateTime();
         $ymd = $today->format('Y-m-') . '15';
         $day = $this->getSession()->getPage()->find('css', '#calendar-day-items-' . $ymd);
-        $day->click();
+        try {
+            $day->click();
+        }
+        catch (\Exception $e) {
+            throw new \Exception('Could not find the day to click on');
+        }
     }
 
     /**
@@ -170,8 +175,25 @@ class FeatureContext extends MinkContext
     public function IClickOnVisibilityBoxes()
     {
         $boxes = $this->getSession()->getPage()->findAll('css', '.visible-box');
+        if (count($boxes) < 1) {
+            throw new \Exception('No visibility boxes on page');
+        }
         foreach ($boxes as $box) {
             $box->click();
+        }
+    }
+
+    /**
+     *  @When /^I click on the first single day event on calendar$/
+     */
+    public function IClickOnTheFirstSingleDayEventOnCalendar()
+    {
+        $event = $this->getSession()->getPage()->find('css', '.calendar-single-event');
+        try {
+            $event->click();
+        }
+        catch (\Exception $e) {
+            throw new \Exception('Could not find an event to click on');
         }
     }
 
