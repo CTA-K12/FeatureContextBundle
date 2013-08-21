@@ -130,12 +130,27 @@ class FeatureContext extends MinkContext
 
     }
 
-        /**
+    /**
      * @When /^I wait for grid search to finish$/
      */
     public function IWaitForGridSearchToFinish()
     {
         $this->getSession()->wait(5000, "$('span.filtered').text() != $('span.total').text()");
+    }
+
+    /**
+     * @Then /^I should see current month$/
+     */
+    public function IShouldSeeCurrentMonth()
+    {
+        $today = new \DateTime();
+        $currentMonth = $today->format('F Y'); //This returns a string with full name of month and 4 digit year
+        $date = $this->getSession()->getPage()->find('css', '.calendar-date');
+        if ($date->getText() != $currentMonth) {
+            throw new \Exception(
+                "The date for the calendar is not the current date"
+            );
+        }
     }
 
 //
