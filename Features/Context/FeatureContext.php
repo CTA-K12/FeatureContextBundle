@@ -221,6 +221,20 @@ class FeatureContext extends MinkContext
         }
     }
 
+    /**
+     * @When /^I click on the middle single day event on calendar$/
+     */
+    public function IClickOnTheMiddleSingleDayEventOnCalendar()
+    {
+        $events = $this->getSession()->getPage()->findAll('css', '.calendar-single-event');
+        try {
+            $events[count($events) / 2]->click();
+        }
+        catch (\Exception $e) {
+            throw new \Exception('Could not find an event to click on');
+        }
+    }
+
 //
 // Place your definition and hook methods here:
 //
