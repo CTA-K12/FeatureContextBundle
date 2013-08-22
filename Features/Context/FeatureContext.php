@@ -197,6 +197,14 @@ class FeatureContext extends MinkContext
         }
     }
 
+    /**
+     *  @When /^I check jQuery wired checkbox "([^"]*)"$/
+     */
+    public function ICheckJQueryWiredCheckbox($field) 
+    {
+        $this->getSession()->executeScript('$("#'.$field.'").attr("checked", "true"); $("#'.$field.'").trigger("change")');
+    }
+
 //
 // Place your definition and hook methods here:
 //
