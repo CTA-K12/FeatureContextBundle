@@ -205,6 +205,22 @@ class FeatureContext extends MinkContext
         $this->getSession()->executeScript('$("#'.$field.'").attr("checked", "true"); $("#'.$field.'").trigger("change")');
     }
 
+    /**
+     * @Then /^I should see next month$/
+     */
+    public function IShouldSeeNextMonth()
+    {
+        $today = new \DateTime();
+        $today->modify('+1 month');
+        $currentMonth = $today->format('F Y'); //This returns a string with full name of month and 4 digit year
+        $date = $this->getSession()->getPage()->find('css', '.calendar-date');
+        if ($date->getText() != $currentMonth) {
+            throw new \Exception(
+                'The date for the calendar is not the current date'
+            );
+        }
+    }
+
 //
 // Place your definition and hook methods here:
 //
