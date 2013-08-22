@@ -159,6 +159,8 @@ class FeatureContext extends MinkContext
     public function IClickOnTheMiddleOfTheMonth()
     {
         $today = new \DateTime();
+        $timestamp = $this->getSession()->getPage()->find('css', '#calendar-info-time')->getHtml();
+        $today->setTimestamp(intval($timestamp));
         $ymd = $today->format('Y-m-') . '15';
         $day = $this->getSession()->getPage()->find('css', '#calendar-day-items-' . $ymd);
         try {
