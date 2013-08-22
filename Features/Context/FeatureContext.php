@@ -222,6 +222,22 @@ class FeatureContext extends MinkContext
     }
 
     /**
+     * @Then /^I should see last month$/
+     */
+    public function IShouldSeeLastMonth()
+    {
+        $today = new \DateTime();
+        $today->modify('-1 month');
+        $currentMonth = $today->format('F Y'); //This returns a string with full name of month and 4 digit year
+        $date = $this->getSession()->getPage()->find('css', '.calendar-date');
+        if ($date->getText() != $currentMonth) {
+            throw new \Exception(
+                'The date for the calendar is not the current date'
+            );
+        }
+    }
+
+    /**
      * @When /^I click on the middle single day event on calendar$/
      */
     public function IClickOnTheMiddleSingleDayEventOnCalendar()
