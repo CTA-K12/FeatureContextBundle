@@ -221,9 +221,9 @@ class FeatureContext extends MinkContext
         else {
             $today->modify('+1 month');
         }
-        $currentMonth = $today->format('F Y'); //This returns a string with full name of month and 4 digit year
+        $nextMonth = $today->format('F Y'); //This returns a string with full name of month and 4 digit year
         $date = $this->getSession()->getPage()->find('css', '.calendar-date');
-        if ($date->getText() != $nextMonth->format('F Y')) {
+        if ($date->getText() != $nextMonth) {
             throw new \Exception(
                 'The month for the calendar ' . $date->getText() . ' is not the next month: ' . $nextMonth->format('F Y')
             );
@@ -244,9 +244,9 @@ class FeatureContext extends MinkContext
         else {
             $today->modify('-1 month');
         }
-        $currentMonth = $today->format('F Y'); //This returns a string with full name of month and 4 digit year
+        $lastMonth = $today->format('F Y'); //This returns a string with full name of month and 4 digit year
         $date = $this->getSession()->getPage()->find('css', '.calendar-date');
-        if ($date->getText() != $lastMonth->format('F Y')) {
+        if ($date->getText() != $lastMonth) {
             throw new \Exception(
                 'The month for the calendar ' . $date->getText() . ' is not the last month: ' . $lastMonth->format('F Y')
             );
