@@ -202,7 +202,7 @@ class FeatureContext extends MinkContext
     /**
      *  @When /^I check jQuery wired checkbox "([^"]*)"$/
      */
-    public function ICheckJQueryWiredCheckbox($field) 
+    public function ICheckJQueryWiredCheckbox($field)
     {
         $this->getSession()->executeScript('$("#'.$field.'").attr("checked", "true"); $("#'.$field.'").trigger("change")');
     }
@@ -213,12 +213,14 @@ class FeatureContext extends MinkContext
     public function IShouldSeeNextMonth()
     {
         $today = new \DateTime();
-        $today->modify('+1 month');
-        $currentMonth = $today->format('F Y'); //This returns a string with full name of month and 4 digit year
+        $thisMonth = $today->format('m');
+        $thisYear = $today->format('Y');
+        $nextMonth = new \DateTime($thisYear . '-' . $thisMonth . '-01');
+        $nextMonth->modify('+1 month');
         $date = $this->getSession()->getPage()->find('css', '.calendar-date');
-        if ($date->getText() != $currentMonth) {
+        if ($date->getText() != $nextMonth->format('F Y')) {
             throw new \Exception(
-                'The date for the calendar is not the current date'
+                'The month for the calendar ' . $date->getText() . ' is not the next month: ' . $nextMonth->format('F Y')
             );
         }
     }
@@ -229,12 +231,14 @@ class FeatureContext extends MinkContext
     public function IShouldSeeLastMonth()
     {
         $today = new \DateTime();
-        $today->modify('-1 month');
-        $currentMonth = $today->format('F Y'); //This returns a string with full name of month and 4 digit year
+        $thisMonth = $today->format('m');
+        $thisYear = $today->format('Y');
+        $lastMonth = new \DateTime($thisYear . '-' . $thisMonth . '-01');
+        $lastMonth->modify('-1 month');
         $date = $this->getSession()->getPage()->find('css', '.calendar-date');
-        if ($date->getText() != $currentMonth) {
+        if ($date->getText() != $lastMonth->format('F Y')) {
             throw new \Exception(
-                'The date for the calendar is not the current date'
+                'The month for the calendar ' . $date->getText() . ' is not the last month: ' . $lastMonth->format('F Y')
             );
         }
     }
