@@ -213,7 +213,14 @@ class FeatureContext extends MinkContext
     public function IShouldSeeNextMonth()
     {
         $today = new \DateTime();
-        $today->modify('+1 month');
+        $check = clone $today;
+        $check->modify('+1 month');
+        if (intval($today->format('m') + 1 < intval($check->format('m')))) {
+            $today->modify('last day of next month');
+        }
+        else {
+            $today->modify('+1 month');
+        }
         $currentMonth = $today->format('F Y'); //This returns a string with full name of month and 4 digit year
         $date = $this->getSession()->getPage()->find('css', '.calendar-date');
         if ($date->getText() != $currentMonth) {
@@ -229,7 +236,14 @@ class FeatureContext extends MinkContext
     public function IShouldSeeLastMonth()
     {
         $today = new \DateTime();
-        $today->modify('-1 month');
+        $check = clone $today;
+        $check->modify('-1 month');
+        if (intval($today->format('m') - 1 < intval($check->format('m')))) {
+            $today->modify('last day of last month');
+        }
+        else {
+            $today->modify('-1 month');
+        }
         $currentMonth = $today->format('F Y'); //This returns a string with full name of month and 4 digit year
         $date = $this->getSession()->getPage()->find('css', '.calendar-date');
         if ($date->getText() != $currentMonth) {
