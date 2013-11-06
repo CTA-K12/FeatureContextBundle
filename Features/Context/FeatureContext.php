@@ -267,6 +267,34 @@ class FeatureContext extends MinkContext
         }
     }
 
+    /**
+     * @When /^I should see icon "(.+?)"$/
+     */
+
+    public function IShouldSeeIcon($icon)
+    {
+        $element = $this->getSession()->getPage()->find('css', '.icon-'.$icon);
+        if (!$element) {
+            throw new \Exception(
+                'icon-'.$icon.' not present contrary to expectation'
+            );
+        }
+    }
+
+    /**
+     * @When /^I should not see icon "(.+?)"$/
+     */
+
+    public function IShouldNotSeeIcon($icon)
+    {
+        $element = $this->getSession()->getPage()->find('css', '.icon-'.$icon);
+        if ($element) {
+            throw new \Exception(
+                'icon-'.$icon.' present contrary to expectation'
+            );
+        }
+    }
+
 //
 // Place your definition and hook methods here:
 //
