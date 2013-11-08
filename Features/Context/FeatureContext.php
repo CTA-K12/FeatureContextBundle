@@ -295,6 +295,22 @@ class FeatureContext extends MinkContext
         }
     }
 
+    /**
+     * @Given /^I click on id "([^"]*)"$/
+     */
+    public function iClickId($arg1)
+    {
+        $element = $this->getSession()->getPage()->find('css', '#' . $arg1);
+        if (is_null($element)) {
+            throw new \Exception('Could not find the element with id ' . $arg1);
+        }
+        try {
+            $element->click();
+        } catch (\Exception $e) {
+            throw new \Exception('Found element with id ' . $arg1 . ' but could not click on it');
+        }
+    }
+
 //
 // Place your definition and hook methods here:
 //
