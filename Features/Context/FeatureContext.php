@@ -86,7 +86,11 @@ class FeatureContext extends MinkContext
      */
     public function IClickOnSelectItem($item)
     {
-        $this->getSession()->getPage()->find('css', 'div.select2-result-label:contains(' . $item . ')')->click();
+        $element = $this->getSession()->getPage()->find('css', 'div.select2-result-label:contains(' . $item . ')');
+        if (is_null($element)) {
+            throw new \Exception('Could not find ' . $item . ' in the select2 dropdown list');
+        }
+        $element->click();
     }
 
     /**
@@ -94,7 +98,11 @@ class FeatureContext extends MinkContext
      */
     public function IClickOnSelectMultiItem($item)
     {
-        $this->getSession()->getPage()->find('css', 'div.select2-result-label:contains(' . $item . ')')->click();
+        $element = $this->getSession()->getPage()->find('css', 'div.select2-result-label:contains(' . $item . ')');
+        if (is_null($element)) {
+            throw new \Exception('Could not find ' . $item . ' in the select2 dropdown list');
+        }
+        $element->click();
     }
 
     /**
@@ -310,6 +318,19 @@ class FeatureContext extends MinkContext
             throw new \Exception('Found element with id ' . $arg1 . ' but could not click on it');
         }
     }
+
+    /**
+     * @Given /^I select2 search for "([^"]*)"$/
+     */
+    public function iSelect2SearchFor($arg1)
+    {
+        $element = $this->getSession()->getPage()->find('css', '.select2-drop-active > .select2-search > .select2-input');
+        if (is_null($element)) {
+            throw new \Exception('Could not find the active select2 input');
+        }
+        $element->setValue($arg1);
+    }
+
 
 //
 // Place your definition and hook methods here:
