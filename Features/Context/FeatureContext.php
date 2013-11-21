@@ -131,6 +131,7 @@ class FeatureContext extends MinkContext
      */
     public function gridSearch($field)
     {
+
         $this->getSession()->getPage()->fillField(
             $this->getSession()->getPage()->find('css', 'input.grid-filter-input-query-from')->getAttribute('id')
             ,$field);
@@ -143,7 +144,7 @@ class FeatureContext extends MinkContext
      */
     public function IWaitForGridSearchToFinish()
     {
-        $this->getSession()->wait(5000, "$('span.filtered').text() != $('span.total').text()");
+        $this->getSession()->wait(5000, "$('span.filtered').text() != $('.total').text()");
     }
 
     /**
@@ -331,6 +332,29 @@ class FeatureContext extends MinkContext
         $element->setValue($arg1);
     }
 
+    /**
+     * @Given /^I resize to tablet$/
+     */
+    public function iResizeToTablet()
+    {
+        $this->getSession()->getDriver()->resizeWindow(920, 1200,'current');
+    }
+
+    /**
+     * @Given /^I resize to full$/
+     */
+    public function iResizeToFull()
+    {
+        $this->getSession()->getDriver()->resizeWindow(1600, 900,'current');
+    }
+
+    /**
+     * @Given /^I resize to mobile$/
+     */
+    public function iResizeToMobile()
+    {
+        $this->getSession()->getDriver()->resizeWindow(480, 600,'current');
+    }
 
 //
 // Place your definition and hook methods here:
