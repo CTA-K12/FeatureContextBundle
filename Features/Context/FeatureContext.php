@@ -282,10 +282,10 @@ class FeatureContext extends MinkContext
 
     public function IShouldSeeIcon($icon)
     {
-        $element = $this->getSession()->getPage()->find('css', '.icon-'.$icon);
+        $element = $this->getSession()->getPage()->find('css', '.'.$icon);
         if (!$element) {
             throw new \Exception(
-                'icon-'.$icon.' not present contrary to expectation'
+                $icon.' not present contrary to expectation'
             );
         }
     }
@@ -296,10 +296,10 @@ class FeatureContext extends MinkContext
 
     public function IShouldNotSeeIcon($icon)
     {
-        $element = $this->getSession()->getPage()->find('css', '.icon-'.$icon);
+        $element = $this->getSession()->getPage()->find('css', '.'.$icon);
         if ($element) {
             throw new \Exception(
-                'icon-'.$icon.' present contrary to expectation'
+                $icon.' present contrary to expectation'
             );
         }
     }
