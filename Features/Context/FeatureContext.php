@@ -263,7 +263,6 @@ implements KernelAwareInterface
      *  @When /^I click on the first to ride box on calendar$/
      */
     public function IClickOnTheFirstToRideBoxOnCalendar() {
-        $field = null;
         $i = 1;
         do {
             if ($i < 10) {
@@ -288,7 +287,6 @@ implements KernelAwareInterface
      *  @Then /^I should see the first to ride box checked$/
      */
     public function IShouldSeeTheFirstToRideBoxChecked() {
-        $field = null;
         $i = 1;
         do {
             if ($i < 10) {
@@ -312,7 +310,6 @@ implements KernelAwareInterface
      *  @Then /^I should not see the first to ride box checked$/
      */
     public function IShouldNotSeeTheFirstToRideBoxChecked() {
-        $field = null;
         $i = 1;
         do {
             if ($i < 10) {
@@ -336,7 +333,6 @@ implements KernelAwareInterface
      *  @When /^I click on the first from ride box on calendar$/
      */
     public function IClickOnTheFirstFromRideBoxOnCalendar() {
-        $field = null;
         $i = 1;
         do {
             if ($i < 10) {
@@ -361,7 +357,6 @@ implements KernelAwareInterface
      *  @Then /^I should see the first from ride box checked$/
      */
     public function IShouldSeeTheFirstFromRideBoxChecked() {
-        $field = null;
         $i = 1;
         do {
             if ($i < 10) {
@@ -385,7 +380,6 @@ implements KernelAwareInterface
      *  @Then /^I should not see the first from ride box checked$/
      */
     public function IShouldNotSeeTheFirstFromRideBoxChecked() {
-        $field = null;
         $i = 1;
         do {
             if ($i < 10) {
@@ -409,7 +403,6 @@ implements KernelAwareInterface
      *  @When /^I click on the first both ride box on calendar$/
      */
     public function IClickOnTheFirstBothRideBoxOnCalendar() {
-        $field = null;
         $i = 1;
         do {
             if ($i < 10) {
@@ -434,7 +427,6 @@ implements KernelAwareInterface
      *  @Then /^I should see the first both ride box checked$/
      */
     public function IShouldSeeTheFirstBothRideBoxChecked() {
-        $field = null;
         $i = 1;
         do {
             if ($i < 10) {
@@ -458,7 +450,6 @@ implements KernelAwareInterface
      *  @Then /^I should not see the first both ride box checked$/
      */
     public function IShouldNotSeeTheFirstBothRideBoxChecked() {
-        $field = null;
         $i = 1;
         do {
             if ($i < 10) {
@@ -482,7 +473,6 @@ implements KernelAwareInterface
      *  @When /^I click on the last to ride box on calendar$/
      */
     public function IClickOnTheLastToRideBoxOnCalendar() {
-        $field = null;
         $i = 31;
         do {
             if ($i < 10) {
@@ -507,7 +497,6 @@ implements KernelAwareInterface
      *  @Then /^I should see the last to ride box checked$/
      */
     public function IShouldSeeTheLastToRideBoxChecked() {
-        $field = null;
         $i = 31;
         do {
             if ($i < 10) {
@@ -531,7 +520,6 @@ implements KernelAwareInterface
      *  @Then /^I should not see the last to ride box checked$/
      */
     public function IShouldNotSeeTheLastToRideBoxChecked() {
-        $field = null;
         $i = 31;
         do {
             if ($i < 10) {
@@ -555,7 +543,6 @@ implements KernelAwareInterface
      *  @When /^I click on the last from ride box on calendar$/
      */
     public function IClickOnTheLastFromRideBoxOnCalendar() {
-        $field = null;
         $i = 31;
         do {
             if ($i < 10) {
@@ -580,7 +567,6 @@ implements KernelAwareInterface
      *  @Then /^I should see the last from ride box checked$/
      */
     public function IShouldSeeTheLastFromRideBoxChecked() {
-        $field = null;
         $i = 31;
         do {
             if ($i < 10) {
@@ -604,7 +590,6 @@ implements KernelAwareInterface
      *  @Then /^I should not see the last from ride box checked$/
      */
     public function IShouldNotSeeTheLastFromRideBoxChecked() {
-        $field = null;
         $i = 31;
         do {
             if ($i < 10) {
@@ -628,7 +613,6 @@ implements KernelAwareInterface
      *  @When /^I click on the last both ride box on calendar$/
      */
     public function IClickOnTheLastBothRideBoxOnCalendar() {
-        $field = null;
         $i = 31;
         do {
             if ($i < 10) {
@@ -653,7 +637,6 @@ implements KernelAwareInterface
      *  @Then /^I should see the last both ride box checked$/
      */
     public function IShouldSeeTheLastBothRideBoxChecked() {
-        $field = null;
         $i = 31;
         do {
             if ($i < 10) {
@@ -677,7 +660,6 @@ implements KernelAwareInterface
      *  @Then /^I should not see the last both ride box checked$/
      */
     public function IShouldNotSeeTheLastBothRideBoxChecked() {
-        $field = null;
         $i = 31;
         do {
             if ($i < 10) {
@@ -694,6 +676,67 @@ implements KernelAwareInterface
         } while ($element == null && $i > 0);
         if ($element->getAttribute('checked') == true) {
             throw new \Exception( 'checkbox is checked' );
+        }
+    }
+
+    /**
+     * @When /^I fill in the first dhc day with "([^"]*)"$/
+     */
+    public function IFillInFirstDhcDayWithValue($arg1) {
+        $i = 1;
+        do {
+            $id = $i . '-dhc';
+            $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
+            if ($element != null && !$element->isVisible()) {
+                $element = null;
+            }
+            $i++;
+        } while ($element == null && $i < 31);
+        if ($element == null) {
+            throw new \Exception( 'Cannot find dhc input box' );
+        }
+        $element->setValue($arg1);
+    }
+
+    /**
+     * @Then /^I should see the value "([^"]*)" in the first dhc day$/
+     */
+    public function IShouldSeeTheValueInTheFirstDhcDay($arg1) {
+        $i = 1;
+        do {
+            $id = $i . '-dhc';
+            $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
+            if ($element != null && !$element->isVisible()) {
+                $element = null;
+            }
+            $i++;
+        } while ($element == null && $i < 31);
+        if ($element == null) {
+            throw new \Exception( 'Cannot find dhc input box' );
+        }
+        if ($element->getValue() != $arg1) {
+            throw new \Exception( 'dhc input does not have the correct value' );
+        }
+    }
+
+    /**
+     * @Then /^I should not see the value "([^"]*)" in the first dhc day$/
+     */
+    public function IShouldNotSeeTheValueInTheFirstDhcDay($arg1) {
+        $i = 1;
+        do {
+            $id = $i . '-dhc';
+            $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
+            if ($element != null && !$element->isVisible()) {
+                $element = null;
+            }
+            $i++;
+        } while ($element == null && $i < 31);
+        if ($element == null) {
+            throw new \Exception( 'Cannot find dhc input box' );
+        }
+        if ($element->getValue() == $arg1) {
+            throw new \Exception( 'dhc input does not have the correct value' );
         }
     }
 
