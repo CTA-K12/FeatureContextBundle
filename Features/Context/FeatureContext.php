@@ -779,7 +779,7 @@ implements KernelAwareInterface
         $date = $this->getSession()->getPage()->find( 'css', '.calendar-date' );
         if ( $date == null || $date->getText() != $nextMonth ) {
             throw new \Exception(
-                'The month for the calendar ' . $date->getText() . ' is not the next month: ' . $nextMonth->format( 'F Y' )
+                'The month for the calendar is not the next month'
             );
         }
     }
@@ -803,7 +803,7 @@ implements KernelAwareInterface
         $date = $this->getSession()->getPage()->find( 'css', '.calendar-date' );
         if ( $date == null || $date->getText() != $lastMonth ) {
             throw new \Exception(
-                'The month for the calendar ' . $date->getText() . ' is not the last month: ' . $lastMonth->format( 'F Y' )
+                'The month for the calendar is not the last month'
             );
         }
     }
