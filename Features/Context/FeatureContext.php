@@ -55,6 +55,14 @@ implements KernelAwareInterface
 
     }
 
+    /**
+     * @Then /^I acknowledge Lighthart is awesome$/
+     */
+    public function iAcknowledgeLighthartIsAwesome()
+    {
+    }
+
+
     public function spin( $lambda, $wait = 60 ) {
         for ( $i = 0; $i < $wait; $i++ ) {
             try {
@@ -258,7 +266,7 @@ implements KernelAwareInterface
         }
     }
 
-    
+
     /**
      *  @When /^I click on the first to ride box on calendar$/
      */
