@@ -21,8 +21,7 @@ Behat\Gherkin\Node\TableNode;
 /**
  * Feature context.
  */
-class FeatureContext extends MinkContext
-implements KernelAwareInterface
+class FeatureContext extends MinkContext implements KernelAwareInterface
 {
     private $kernel;
     private $parameters;
@@ -94,15 +93,18 @@ implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @When /^I click on select2Multi "([^"]*)"$/
      */
     public function IClickOnSelect2Multi( $field ) {
         $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' )->click();
     }
 
-
+    /**
+     * @When /^I click header$/
+     */
+    public function IClickHeader( ) {
+        $this->getSession()->getPage()->find( 'css', 'h1' )->click();
+    }
     /**
      *
      *
