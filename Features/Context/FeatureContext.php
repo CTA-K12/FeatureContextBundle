@@ -106,8 +106,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $this->getSession()->getPage()->find( 'css', 'h1' )->click();
     }
     /**
-     *
-     *
      * @When /^I wait for select2 to populate$/
      */
     public function IWaitForSelect2ToPopulate() {
@@ -115,11 +113,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @When /^I click on select2 item "([^"]*)"$/
      */
-    public function IClickOnSelectItem( $item ) {
+    public function IClickOnSelect2Item( $item ) {
         $element = $this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $item . ')' );
         if ( is_null( $element ) ) {
             throw new \Exception( 'Could not find ' . $item . ' in the select2 dropdown list' );
@@ -128,11 +124,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @When /^I click on select2Multi item "([^"]*)"$/
      */
-    public function IClickOnSelectMultiItem( $item ) {
+    public function IClickOnSelect2MultiItem( $item ) {
         $element = $this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $item . ')' );
         if ( is_null( $element ) ) {
             throw new \Exception( 'Could not find ' . $item . ' in the select2 dropdown list' );
@@ -141,17 +135,72 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @When /^I deselect2Multi "([^"]*)"$/
      */
     public function IDeselect2Multi( $field ) {
-        $link=$this->getSession()->getPage()->find(
+        $link = $this->getSession()->getPage()->find(
             'xpath',
-            $this->getSession()->getSelectorsHandler()->selectorToXpath( 'css', 'li:contains(' . $field. ') a' )
+            $this->getSession()->getSelectorsHandler()->selectorToXpath( 'css', 'li.select2-search-choice:contains(' . $field. ') a' )
         );
-
         $link->click();
+    }
+
+    /**
+     * @Given /^I select2Multi search for "([^"]*)"$/
+     */
+    public function iSelect2SearchFor( $arg1 ) {
+        $element = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
+        if ( is_null( $element ) ) {
+            throw new \Exception( 'Could not find the active select2 input' );
+        }
+        $element->setValue( $arg1 );
+    }
+
+    /**
+     * @Given /^I select2 search for "([^"]*)"$/
+     */
+    public function iSelect2MultiSearchFor( $arg1 ) {
+        $element = $this->getSession()->getPage()->find( 'css', '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input' );
+        if ( is_null( $element ) ) {
+            throw new \Exception( 'Could not find the open select2Multi input' );
+        }
+        $element->setValue( $arg1 );
+    }
+
+    /**
+     * @When /^I multiselectajax "([^"]*)" from "([^"]*)"$/
+     */
+    public function IMultiSelectAJAX( $value, $field ) {
+
+        // click field
+        $control = $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' );
+        if ( is_null( $control ) ) {
+            throw new \Exception( 'Could not find the active select2 input' );
+        }
+        $control->click();
+        $this->getSession()->wait( 5000, "$('.select2-searching').length > 0" );
+
+        // enter search
+        $input = $this->getSession()->getPage()->find( 'css', '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input' );
+        if ( is_null( $input ) ) {
+            throw new \Exception( 'Could not find the active select2 input' );
+        }
+        $input->setValue( $value );
+
+        // wait to populate
+        $this->getSession()->wait( 5000, "$('.select2-searching').length < 1" );
+
+        // click selector
+        $element = $this->getSession()->getPage()->find( 'css', 'li.select2-result-selectable > div.select2-result-label:contains(' . $value . ')' );
+
+        if ( is_null( $element ) ) {
+            throw new \Exception( 'Could not find ' . $value . ' in the select2 dropdown list; it is probably already selected' );
+        } else {
+            $element->click();
+        }
+
+        //change focus
+        $this->getSession()->getPage()->find( 'css', 'h1' )->click();
     }
 
     /**
@@ -880,18 +929,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         }
     }
 
-    /**
-     *
-     *
-     * @Given /^I select2 search for "([^"]*)"$/
-     */
-    public function iSelect2SearchFor( $arg1 ) {
-        $element = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
-        if ( is_null( $element ) ) {
-            throw new \Exception( 'Could not find the active select2 input' );
-        }
-        $element->setValue( $arg1 );
-    }
+
+
 
     /**
      *
