@@ -146,7 +146,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     * @Given /^I select2Multi search for "([^"]*)"$/
+     * @Given /^I select2 search for "([^"]*)"$/
      */
     public function iSelect2SearchFor( $arg1 ) {
         $element = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
@@ -157,7 +157,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     * @Given /^I select2 search for "([^"]*)"$/
+     * @Given /^I select2Multi for "([^"]*)"$/
      */
     public function iSelect2MultiSearchFor( $arg1 ) {
         $element = $this->getSession()->getPage()->find( 'css', '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input' );
