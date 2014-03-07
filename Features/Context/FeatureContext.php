@@ -55,14 +55,15 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Then /^I acknowledge Lighthart is awesome$/
      */
-    public function iAcknowledgeLighthartIsAwesome()
-    {
+    public function iAcknowledgeLighthartIsAwesome() {
     }
 
 
-    public function spin( $lambda, $wait = 60 ) {
+    public function spin( $lambda, $wait = 200 ) {
         for ( $i = 0; $i < $wait; $i++ ) {
             try {
                 if ( $lambda( $this ) ) {
@@ -72,7 +73,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                 // do nothing
             }
 
-            sleep( 1 );
+            usleep( 5000 );
         }
 
         $backtrace = debug_backtrace();
@@ -93,6 +94,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @When /^I click on select2Multi "([^"]*)"$/
      */
     public function IClickOnSelect2Multi( $field ) {
@@ -100,12 +103,16 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @When /^I click header$/
      */
     public function IClickHeader( ) {
         $this->getSession()->getPage()->find( 'css', 'h1' )->click();
     }
     /**
+     *
+     *
      * @When /^I wait for select2 to populate$/
      */
     public function IWaitForSelect2ToPopulate() {
@@ -113,6 +120,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @When /^I click on select2 item "([^"]*)"$/
      */
     public function IClickOnSelect2Item( $item ) {
@@ -124,6 +133,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @When /^I click on select2Multi item "([^"]*)"$/
      */
     public function IClickOnSelect2MultiItem( $item ) {
@@ -136,23 +147,37 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
 
     /**
-     * @When /^I deselect2Multi "([^"]*)"$/
+     *
+     *
+     * @When /^I deselectMulti "([^"]*)" from "([^"]*)"$/
      */
-    public function IDeselect2Multi( $field ) {
+    public function IDeselectMulti( $value, $field ) {
         $link = $this->getSession()->getPage()->find(
             'xpath',
-            $this->getSession()->getSelectorsHandler()->selectorToXpath( 'css', 'li.select2-search-choice:contains(' . $field. ') a' )
+            $this->getSession()->getSelectorsHandler()->selectorToXpath( 'css', 'div#'.$field.'> ul > li.select2-search-choice:contains(' . $value. ') a' )
         );
         $link->click();
+        $this->getSession()->getPage()->find( 'css', 'h1' )->click();
+
+        // This bit keeps it active until the selector is gone.
+        $this->spin( function( $context ) use ( $field, $value ) {
+                $link = $this->getSession()->getPage()->find(
+                    'xpath',
+                    $this->getSession()->getSelectorsHandler()->selectorToXpath( 'css', 'div#'.$field.'> ul > li.select2-search-choice:contains(' . $value. ') a' )
+                );
+                return !$link;
+            } );
     }
 
     /**
+     *
+     *
      * @When /^I deselect "([^"]*)"$/
      */
     public function IDeselect( $field ) {
         $link = $this->getSession()->getPage()->find(
             'xpath',
-            $this->getSession()->getSelectorsHandler()->selectorToXpath( 'css', 'div#'.$field.'> a > .select2-search-choice-close' )
+            $this->getSession()->getSelectorsHandler()->selectorToXpath( 'css', 'div#'.$field.'> ul > li a > .select2-search-choice-close' )
         );
 
         $close = $this->getSession()->getPage()->find( 'css', 'div#'.$field.'> a > .select2-search-choice-close' );
@@ -161,6 +186,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
 
     /**
+     *
+     *
      * @Given /^I select2 search for "([^"]*)"$/
      */
     public function iSelect2SearchFor( $arg1 ) {
@@ -172,6 +199,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Given /^I select2Multi for "([^"]*)"$/
      */
     public function iSelect2MultiSearchFor( $arg1 ) {
@@ -183,6 +212,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @When /^I selectajax "([^"]*)" from "([^"]*)"$/
      */
     public function ISelectAJAX( $value, $field ) {
@@ -204,6 +235,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @When /^I multiselectajax "([^"]*)" from "([^"]*)"$/
      */
     public function IMultiSelectAJAX( $value, $field ) {
@@ -242,6 +275,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
     /**
      * for Testing atoms work
+     *
      * @When /^I multiselectopen "([^"]*)"$/
      */
     public function IMultiSelectOpen( $field ) {
@@ -371,19 +405,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IClickOnTheFirstToRideBoxOnCalendar() {
         $i = 1;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-to';
             }
             else {
                 $id = $i . '-to';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i++;
-        } while ($element == null && $i < 31);
-        if ($element == null) {
+        } while ( $element == null && $i < 31 );
+        if ( $element == null ) {
             throw new \Exception( 'Cannot find ride checkbox' );
         }
         $element->click();
@@ -395,19 +429,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldSeeTheFirstToRideBoxChecked() {
         $i = 1;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-to';
             }
             else {
                 $id = $i . '-to';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i++;
-        } while ($element == null && $i < 31);
-        if ($element->getAttribute('checked') == false) {
+        } while ( $element == null && $i < 31 );
+        if ( $element->getAttribute( 'checked' ) == false ) {
             throw new \Exception( 'checkbox is not checked' );
         }
     }
@@ -418,19 +452,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldNotSeeTheFirstToRideBoxChecked() {
         $i = 1;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-to';
             }
             else {
                 $id = $i . '-to';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i++;
-        } while ($element == null && $i < 31);
-        if ($element->getAttribute('checked') == true) {
+        } while ( $element == null && $i < 31 );
+        if ( $element->getAttribute( 'checked' ) == true ) {
             throw new \Exception( 'checkbox is checked' );
         }
     }
@@ -441,19 +475,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IClickOnTheFirstFromRideBoxOnCalendar() {
         $i = 1;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-from';
             }
             else {
                 $id = $i . '-from';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i++;
-        } while ($element == null && $i < 31);
-        if ($element == null) {
+        } while ( $element == null && $i < 31 );
+        if ( $element == null ) {
             throw new \Exception( 'Cannot find ride checkbox' );
         }
         $element->click();
@@ -465,19 +499,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldSeeTheFirstFromRideBoxChecked() {
         $i = 1;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-from';
             }
             else {
                 $id = $i . '-from';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i++;
-        } while ($element == null && $i < 31);
-        if ($element->getAttribute('checked') == false) {
+        } while ( $element == null && $i < 31 );
+        if ( $element->getAttribute( 'checked' ) == false ) {
             throw new \Exception( 'checkbox is not checked' );
         }
     }
@@ -488,19 +522,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldNotSeeTheFirstFromRideBoxChecked() {
         $i = 1;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-from';
             }
             else {
                 $id = $i . '-from';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i++;
-        } while ($element == null && $i < 31);
-        if ($element->getAttribute('checked') == true) {
+        } while ( $element == null && $i < 31 );
+        if ( $element->getAttribute( 'checked' ) == true ) {
             throw new \Exception( 'checkbox is checked' );
         }
     }
@@ -511,19 +545,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IClickOnTheFirstBothRideBoxOnCalendar() {
         $i = 1;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-both';
             }
             else {
                 $id = $i . '-both';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i++;
-        } while ($element == null && $i < 31);
-        if ($element == null) {
+        } while ( $element == null && $i < 31 );
+        if ( $element == null ) {
             throw new \Exception( 'Cannot find ride checkbox' );
         }
         $element->click();
@@ -535,19 +569,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldSeeTheFirstBothRideBoxChecked() {
         $i = 1;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-both';
             }
             else {
                 $id = $i . '-both';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i++;
-        } while ($element == null && $i < 31);
-        if ($element->getAttribute('checked') == false) {
+        } while ( $element == null && $i < 31 );
+        if ( $element->getAttribute( 'checked' ) == false ) {
             throw new \Exception( 'checkbox is not checked' );
         }
     }
@@ -558,19 +592,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldNotSeeTheFirstBothRideBoxChecked() {
         $i = 1;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-both';
             }
             else {
                 $id = $i . '-both';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i++;
-        } while ($element == null && $i < 31);
-        if ($element->getAttribute('checked') == true) {
+        } while ( $element == null && $i < 31 );
+        if ( $element->getAttribute( 'checked' ) == true ) {
             throw new \Exception( 'checkbox is checked' );
         }
     }
@@ -581,19 +615,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IClickOnTheLastToRideBoxOnCalendar() {
         $i = 31;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-to';
             }
             else {
                 $id = $i . '-to';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i--;
-        } while ($element == null && $i > 0);
-        if ($element == null) {
+        } while ( $element == null && $i > 0 );
+        if ( $element == null ) {
             throw new \Exception( 'Cannot find ride checkbox' );
         }
         $element->click();
@@ -605,19 +639,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldSeeTheLastToRideBoxChecked() {
         $i = 31;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-to';
             }
             else {
                 $id = $i . '-to';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i--;
-        } while ($element == null && $i > 0);
-        if ($element->getAttribute('checked') == false) {
+        } while ( $element == null && $i > 0 );
+        if ( $element->getAttribute( 'checked' ) == false ) {
             throw new \Exception( 'checkbox is not checked' );
         }
     }
@@ -628,19 +662,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldNotSeeTheLastToRideBoxChecked() {
         $i = 31;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-to';
             }
             else {
                 $id = $i . '-to';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i--;
-        } while ($element == null && $i > 0);
-        if ($element->getAttribute('checked') == true) {
+        } while ( $element == null && $i > 0 );
+        if ( $element->getAttribute( 'checked' ) == true ) {
             throw new \Exception( 'checkbox is checked' );
         }
     }
@@ -651,19 +685,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IClickOnTheLastFromRideBoxOnCalendar() {
         $i = 31;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-from';
             }
             else {
                 $id = $i . '-from';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i--;
-        } while ($element == null && $i > 0);
-        if ($element == null) {
+        } while ( $element == null && $i > 0 );
+        if ( $element == null ) {
             throw new \Exception( 'Cannot find ride checkbox' );
         }
         $element->click();
@@ -675,19 +709,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldSeeTheLastFromRideBoxChecked() {
         $i = 31;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-from';
             }
             else {
                 $id = $i . '-from';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i--;
-        } while ($element == null && $i > 0);
-        if ($element->getAttribute('checked') == false) {
+        } while ( $element == null && $i > 0 );
+        if ( $element->getAttribute( 'checked' ) == false ) {
             throw new \Exception( 'checkbox is not checked' );
         }
     }
@@ -698,19 +732,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldNotSeeTheLastFromRideBoxChecked() {
         $i = 31;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-from';
             }
             else {
                 $id = $i . '-from';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i--;
-        } while ($element == null && $i > 0);
-        if ($element->getAttribute('checked') == true) {
+        } while ( $element == null && $i > 0 );
+        if ( $element->getAttribute( 'checked' ) == true ) {
             throw new \Exception( 'checkbox is checked' );
         }
     }
@@ -721,19 +755,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IClickOnTheLastBothRideBoxOnCalendar() {
         $i = 31;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-both';
             }
             else {
                 $id = $i . '-both';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i--;
-        } while ($element == null && $i > 0);
-        if ($element == null) {
+        } while ( $element == null && $i > 0 );
+        if ( $element == null ) {
             throw new \Exception( 'Cannot find ride checkbox' );
         }
         $element->click();
@@ -745,19 +779,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldSeeTheLastBothRideBoxChecked() {
         $i = 31;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-both';
             }
             else {
                 $id = $i . '-both';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i--;
-        } while ($element == null && $i > 0);
-        if ($element->getAttribute('checked') == false) {
+        } while ( $element == null && $i > 0 );
+        if ( $element->getAttribute( 'checked' ) == false ) {
             throw new \Exception( 'checkbox is not checked' );
         }
     }
@@ -768,80 +802,86 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldNotSeeTheLastBothRideBoxChecked() {
         $i = 31;
         do {
-            if ($i < 10) {
+            if ( $i < 10 ) {
                 $id = '0' . $i . '-both';
             }
             else {
                 $id = $i . '-both';
             }
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i--;
-        } while ($element == null && $i > 0);
-        if ($element->getAttribute('checked') == true) {
+        } while ( $element == null && $i > 0 );
+        if ( $element->getAttribute( 'checked' ) == true ) {
             throw new \Exception( 'checkbox is checked' );
         }
     }
 
     /**
+     *
+     *
      * @When /^I fill in the first dhc day with "([^"]*)"$/
      */
-    public function IFillInFirstDhcDayWithValue($arg1) {
+    public function IFillInFirstDhcDayWithValue( $arg1 ) {
         $i = 1;
         do {
             $id = $i . '-dhc';
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i++;
-        } while ($element == null && $i < 31);
-        if ($element == null) {
+        } while ( $element == null && $i < 31 );
+        if ( $element == null ) {
             throw new \Exception( 'Cannot find dhc input box' );
         }
-        $element->setValue($arg1);
+        $element->setValue( $arg1 );
     }
 
     /**
+     *
+     *
      * @Then /^I should see the value "([^"]*)" in the first dhc day$/
      */
-    public function IShouldSeeTheValueInTheFirstDhcDay($arg1) {
+    public function IShouldSeeTheValueInTheFirstDhcDay( $arg1 ) {
         $i = 1;
         do {
             $id = $i . '-dhc';
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i++;
-        } while ($element == null && $i < 31);
-        if ($element == null) {
+        } while ( $element == null && $i < 31 );
+        if ( $element == null ) {
             throw new \Exception( 'Cannot find dhc input box' );
         }
-        if ($element->getValue() != $arg1) {
+        if ( $element->getValue() != $arg1 ) {
             throw new \Exception( 'dhc input does not have the correct value' );
         }
     }
 
     /**
+     *
+     *
      * @Then /^I should not see the value "([^"]*)" in the first dhc day$/
      */
-    public function IShouldNotSeeTheValueInTheFirstDhcDay($arg1) {
+    public function IShouldNotSeeTheValueInTheFirstDhcDay( $arg1 ) {
         $i = 1;
         do {
             $id = $i . '-dhc';
             $element = $this->getSession()->getPage()->find( 'css', '#' . $id );
-            if ($element != null && !$element->isVisible()) {
+            if ( $element != null && !$element->isVisible() ) {
                 $element = null;
             }
             $i++;
-        } while ($element == null && $i < 31);
-        if ($element == null) {
+        } while ( $element == null && $i < 31 );
+        if ( $element == null ) {
             throw new \Exception( 'Cannot find dhc input box' );
         }
-        if ($element->getValue() == $arg1) {
+        if ( $element->getValue() == $arg1 ) {
             throw new \Exception( 'dhc input does not have the correct value' );
         }
     }
