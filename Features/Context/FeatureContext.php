@@ -147,8 +147,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
 
     /**
-     *
-     *
      * @When /^I deselectMulti "([^"]*)" from "([^"]*)"$/
      */
     public function IDeselectMulti( $value, $field ) {
