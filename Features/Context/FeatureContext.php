@@ -134,6 +134,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $element->click();
     }
 
+
     /**
      * @When /^I deselect2Multi "([^"]*)"$/
      */
@@ -144,6 +145,20 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         );
         $link->click();
     }
+
+    /**
+     * @When /^I deselect "([^"]*)"$/
+     */
+    public function IDeselect( $field ) {
+        $link = $this->getSession()->getPage()->find(
+            'xpath',
+            $this->getSession()->getSelectorsHandler()->selectorToXpath( 'css', 'div#'.$field.'> a > .select2-search-choice-close' )
+        );
+
+        $close = $this->getSession()->getPage()->find( 'css', 'div#'.$field.'> a > .select2-search-choice-close' );
+        $link->click();
+    }
+
 
     /**
      * @Given /^I select2 search for "([^"]*)"$/
@@ -168,6 +183,27 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     * @When /^I selectajax "([^"]*)" from "([^"]*)"$/
+     */
+    public function ISelectAJAX( $value, $field ) {
+        $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > a' )->click();
+
+
+        $element = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
+        if ( is_null( $element ) ) {
+            throw new \Exception( 'Could not find the active select2 input' );
+        }
+        $element->setValue( $value );
+
+        $this->getSession()->wait( 5000, "$('.select2-searching').length < 1" );
+        $element = $this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $value . ')' );
+        if ( is_null( $element ) ) {
+            throw new \Exception( 'Could not find ' . $value . ' in the select2 dropdown list' );
+        }
+        $element->click();
+    }
+
+    /**
      * @When /^I multiselectajax "([^"]*)" from "([^"]*)"$/
      */
     public function IMultiSelectAJAX( $value, $field ) {
@@ -179,6 +215,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         }
         $control->click();
         $this->getSession()->wait( 5000, "$('.select2-searching').length > 0" );
+        $this->getSession()->wait( 5000, "$('.select2-result-selectable').length > 0" );
 
         // enter search
         $input = $this->getSession()->getPage()->find( 'css', '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input' );
@@ -204,6 +241,22 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     * for Testing atoms work
+     * @When /^I multiselectopen "([^"]*)"$/
+     */
+    public function IMultiSelectOpen( $field ) {
+
+        // click field
+        $control = $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' );
+        if ( is_null( $control ) ) {
+            throw new \Exception( 'Could not find the active select2 input' );
+        }
+        $control->click();
+        $this->getSession()->wait( 5000, "$('.select2-searching').length > 0" );
+        $this->getSession()->wait( 5000, "$('.select2-result-selectable').length > 0" );
+    }
+
+    /**
      *
      *
      * @When /^I wait (\d+) ms$/
@@ -217,18 +270,21 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      * @When /^I grid search for "(.+?)"$/
      */
-    public function gridSearch( $field ) {
-        $this->spin( function( $context ) use ( $field ) {
+    public function gridSearch( $value ) {
+        $this->spin( function( $context ) use ( $value ) {
                 $this->getSession()->getPage()->fillField(
                     $this->getSession()
                     ->getPage()
                     ->find( 'css', 'input.grid-filter-input-query-from' )
                     ->getAttribute( 'id' )
-                    , $field );
+                    , $value );
                 return true;
             } );
 
         $this->getSession()->getPage()->find( 'css', 'input.grid-filter-input-query-from' )->keyup( ' ' );
+        // angrid is a piece of crap
+        $this->getSession()->wait( 1000 );
+        $this->getSession()->wait( 5000, "$('span.filtered').text() != $('.total').text()" );
     }
 
     /**
@@ -244,15 +300,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                 ->click();
                 return true;
             } );
-    }
-
-    /**
-     *
-     *
-     * @When /^I wait for grid search to finish$/
-     */
-    public function IWaitForGridSearchToFinish() {
-        $this->getSession()->wait( 5000, "$('span.filtered').text() != $('.total').text()" );
     }
 
     /**
