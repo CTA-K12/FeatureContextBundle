@@ -315,7 +315,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
         $this->getSession()->getPage()->find( 'css', 'input.grid-filter-input-query-from' )->keyup( ' ' );
         // angrid is a piece of crap
-        $this->getSession()->wait( 1000 );
+        $this->getSession()->wait( 2000 );
         $this->getSession()->wait( 5000, "$('span.filtered').text() != $('.total').text()" );
     }
 
