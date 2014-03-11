@@ -46,8 +46,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @Given /^I do nothing$/
      */
     public function IDoNothing() {
@@ -55,34 +53,52 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @Then /^I acknowledge Lighthart is awesome$/
      */
     public function iAcknowledgeLighthartIsAwesome() {
     }
 
+    // /**
+    //  * @When /^I edit$/
+    //  */
+    // public function iEdit() {
+    //     $this->getSession()->getPage()->clickLink('Edit');
+    //     $this->spin( function( $context ) {
+    //             $link = $this->getSession()->getPage()->find(
+    //                 'xpath',
+    //                 $this->getSession()->getSelectorsHandler()
+    //                 ->selectorToXpath( 'css',
+    //                     'input.loading-select2' )
+    //             );
+    //             return !$link;
+    //         } );
+    // }
+
     /**
+     * Clicks link with specified id|title|alt|text.
      *
-     *
-     * @When /^I edit$/
+     * @When /^(?:|I )goto "(?P<link>(?:[^"]|\\")*)"$/
      */
-    public function iEdit() {
-        $this->getSession()->getPage()->clickLink('Edit');
+    public function clickLink($link)
+    {
+        parent::clickLink($link);
+        var_dump(__LINE__);
         $this->spin( function( $context ) {
-                $link = $this->getSession()->getPage()->find(
+            var_dump(__LINE__);
+                $loading = $this->getSession()->getPage()->find(
                     'xpath',
                     $this->getSession()->getSelectorsHandler()
                     ->selectorToXpath( 'css',
                         'input.loading-select2' )
                 );
-                return !$link;
+                return !$loading;
             } );
     }
 
 
     public function spin( $lambda, $wait = 200 ) {
         for ( $i = 0; $i < $wait; $i++ ) {
+            var_dump($i);
             try {
                 if ( $lambda( $this ) ) {
                     return true;
