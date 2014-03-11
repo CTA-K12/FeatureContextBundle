@@ -62,6 +62,24 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function iAcknowledgeLighthartIsAwesome() {
     }
 
+    /**
+     *
+     *
+     * @When /^I edit$/
+     */
+    public function iEdit() {
+        $this->getSession()->getPage()->clickLink('Edit');
+        $this->spin( function( $context ) {
+                $link = $this->getSession()->getPage()->find(
+                    'xpath',
+                    $this->getSession()->getSelectorsHandler()
+                    ->selectorToXpath( 'css',
+                        'input.loading-select2' )
+                );
+                return !$link;
+            } );
+    }
+
 
     public function spin( $lambda, $wait = 200 ) {
         for ( $i = 0; $i < $wait; $i++ ) {
@@ -147,6 +165,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
 
     /**
+     *
+     *
      * @When /^I deselectMulti "([^"]*)" from "([^"]*)"$/
      */
     public function IDeselectMulti( $value, $field ) {
@@ -161,7 +181,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $this->spin( function( $context ) use ( $field, $value ) {
                 $link = $this->getSession()->getPage()->find(
                     'xpath',
-                    $this->getSession()->getSelectorsHandler()->selectorToXpath( 'css', 'div#'.$field.'> ul > li.select2-search-choice:contains(' . $value. ') a' )
+                    $this->getSession()->getSelectorsHandler()
+                    ->selectorToXpath( 'css',
+                        'div#'.$field.'> ul > li.select2-search-choice:contains(' . $value. ') a' )
                 );
                 return !$link;
             } );
