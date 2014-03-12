@@ -218,13 +218,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @When /^I deselect "([^"]*)"$/
      */
     public function IDeselect( $field ) {
-        $link = $this->getSession()->getPage()->find(
-            'xpath',
-            $this->getSession()->getSelectorsHandler()->selectorToXpath( 'css', 'div#'.$field.'> ul > li a > .select2-search-choice-close' )
-        );
-
         $close = $this->getSession()->getPage()->find( 'css', 'div#'.$field.'> a > .select2-search-choice-close' );
-        $link->click();
+        $close->click();
     }
 
 
