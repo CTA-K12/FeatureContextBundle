@@ -46,6 +46,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Given /^I do nothing$/
      */
     public function IDoNothing() {
@@ -53,6 +55,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Then /^I acknowledge Lighthart is awesome$/
      */
     public function iAcknowledgeLighthartIsAwesome() {
@@ -79,26 +83,30 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      * @When /^(?:|I )goto "(?P<link>(?:[^"]|\\")*)"$/
      */
-    public function clickLink($link)
-    {
-        parent::clickLink($link);
-        var_dump(__LINE__);
-        $this->spin( function( $context ) {
-            var_dump(__LINE__);
-                $loading = $this->getSession()->getPage()->find(
-                    'xpath',
-                    $this->getSession()->getSelectorsHandler()
-                    ->selectorToXpath( 'css',
-                        'input.loading-select2' )
-                );
-                return !$loading;
-            } );
+    public function clickLink( $link ) {
+        parent::clickLink( $link );
+        if ( 'Edit' == $link ) {
+            $this->spin( function( $context ) {
+                    $selected = $this->getSession()->getPage()->find( 'css', '#footer' );
+                    // print_r( $selected->getHTML() );
+                    return $selected;
+                } );
+            $i = 0;
+            $divs = $this->getSession()->getPage()->findAll( 'css', 'div.s2 > a.select2-choice > span' );
+            while ( $i < 1000 && $divs != array() ) {
+                $divs = array_filter($divs, function($e){
+                    return !$e->getHTML();
+                });
+
+                $i++;
+                usleep( 1000 );
+            }
+        }
     }
 
 
     public function spin( $lambda, $wait = 200 ) {
         for ( $i = 0; $i < $wait; $i++ ) {
-            var_dump($i);
             try {
                 if ( $lambda( $this ) ) {
                     return true;
@@ -106,7 +114,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             } catch ( Exception $e ) {
                 // do nothing
             }
-
             usleep( 5000 );
         }
 
