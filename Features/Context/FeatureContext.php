@@ -94,9 +94,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             $i = 0;
             $divs = $this->getSession()->getPage()->findAll( 'css', 'div.s2 > a.select2-choice > span' );
             while ( $i < 1000 && $divs != array() ) {
-                $divs = array_filter($divs, function($e){
-                    return !$e->getHTML();
-                });
+                $divs = array_filter( $divs, function( $e ) {
+                        return !$e->getHTML();
+                    } );
 
                 $i++;
                 usleep( 1000 );
