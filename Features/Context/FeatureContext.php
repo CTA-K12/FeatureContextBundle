@@ -45,9 +45,33 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $this->kernel = $kernel;
     }
 
+
+    // Waits for itm to be true.
+    // Tries condition every 5 ms for 200 cycles
+    // catches exceptions until time limit, then fails
+
+    public function spin( $lambda, $wait = 200 ) {
+        for ( $i = 0; $i < $wait; $i++ ) {
+            try {
+                if ( $lambda( $this ) ) {
+                    return true;
+                }
+            } catch ( \Exception $e ) {
+                // do nothing
+            }
+            usleep( 5000 );
+        }
+
+        $backtrace = debug_backtrace();
+
+        throw new \Exception(
+            "Timeout thrown by " . $backtrace[1]['class'] . "::" . $backtrace[1]['function'] . "()\n" .
+            $backtrace[1]['file'] . ", line " . $backtrace[1]['line']
+        );
+    }
+
+
     /**
-     *
-     *
      * @Given /^I do nothing$/
      */
     public function IDoNothing() {
@@ -55,28 +79,12 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
+     * Because it is true
      *
      * @Then /^I acknowledge Lighthart is awesome$/
      */
     public function iAcknowledgeLighthartIsAwesome() {
     }
-
-    // /**
-    //  * @When /^I edit$/
-    //  */
-    // public function iEdit() {
-    //     $this->getSession()->getPage()->clickLink('Edit');
-    //     $this->spin( function( $context ) {
-    //             $link = $this->getSession()->getPage()->find(
-    //                 'xpath',
-    //                 $this->getSession()->getSelectorsHandler()
-    //                 ->selectorToXpath( 'css',
-    //                     'input.loading-select2' )
-    //             );
-    //             return !$link;
-    //         } );
-    // }
 
     /**
      * Clicks link with specified id|title|alt|text.
@@ -105,37 +113,17 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
 
-    public function spin( $lambda, $wait = 200 ) {
-        for ( $i = 0; $i < $wait; $i++ ) {
-            try {
-                if ( $lambda( $this ) ) {
-                    return true;
-                }
-            } catch ( Exception $e ) {
-                // do nothing
-            }
-            usleep( 5000 );
-        }
-
-        $backtrace = debug_backtrace();
-
-        throw new Exception(
-            "Timeout thrown by " . $backtrace[1]['class'] . "::" . $backtrace[1]['function'] . "()\n" .
-            $backtrace[1]['file'] . ", line " . $backtrace[1]['line']
-        );
-    }
-
     /**
      *
      *
-     * @When /^I click on select2 "([^"]*)"$/
+     * @When /^I selectOpen "([^"]*)"$/
      */
-    public function IClickOnSelect2( $field ) {
+    public function ISelectOpen( $field ) {
         $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > a' )->click();
     }
 
     /**
-     *
+     * Deprecated
      *
      * @When /^I click on select2Multi "([^"]*)"$/
      */
@@ -144,7 +132,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
+     * Just to defocus
      *
      * @When /^I click header$/
      */
@@ -152,7 +140,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $this->getSession()->getPage()->find( 'css', 'h1' )->click();
     }
     /**
-     *
+     * For singles
      *
      * @When /^I wait for select2 to populate$/
      */
@@ -161,7 +149,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
+     * Deprecated
      *
      * @When /^I click on select2 item "([^"]*)"$/
      */
@@ -174,11 +162,11 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     * Deprecated
      *
-     *
-     * @When /^I click on select2Multi item "([^"]*)"$/
+     * @When /^I selectOpenMulti item "([^"]*)"$/
      */
-    public function IClickOnSelect2MultiItem( $item ) {
+    public function ISelectOpenMultiItem( $item ) {
         $element = $this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $item . ')' );
         if ( is_null( $element ) ) {
             throw new \Exception( 'Could not find ' . $item . ' in the select2 dropdown list' );
@@ -188,8 +176,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
 
     /**
-     *
-     *
      * @When /^I deselectMulti "([^"]*)" from "([^"]*)"$/
      */
     public function IDeselectMulti( $value, $field ) {
@@ -213,8 +199,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @When /^I deselect "([^"]*)"$/
      */
     public function IDeselect( $field ) {
@@ -222,37 +206,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $close->click();
     }
 
-
-    /**
-     *
-     *
-     * @Given /^I select2 search for "([^"]*)"$/
-     */
-    public function iSelect2SearchFor( $arg1 ) {
-        $element = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
-        if ( is_null( $element ) ) {
-            throw new \Exception( 'Could not find the active select2 input' );
-        }
-        $element->setValue( $arg1 );
-    }
-
-    /**
-     *
-     *
-     * @Given /^I select2Multi for "([^"]*)"$/
-     */
-    public function iSelect2MultiSearchFor( $arg1 ) {
-        $element = $this->getSession()->getPage()->find( 'css', '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input' );
-        if ( is_null( $element ) ) {
-            throw new \Exception( 'Could not find the open select2Multi input' );
-        }
-        $element->setValue( $arg1 );
-    }
-
-    /**
-     *
-     *
-     * @When /^I selectajax "([^"]*)" from "([^"]*)"$/
+/**
+     * @When /^I selectAjax "([^"]*)" from "([^"]*)"$/
      */
     public function ISelectAJAX( $value, $field ) {
         $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > a' )->click();
@@ -273,9 +228,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
-     * @When /^I multiselectajax "([^"]*)" from "([^"]*)"$/
+     * @When /^I multiSelectAjax "([^"]*)" from "([^"]*)"$/
      */
     public function IMultiSelectAJAX( $value, $field ) {
 
@@ -314,7 +267,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     /**
      * for Testing atoms work
      *
-     * @When /^I multiselectopen "([^"]*)"$/
+     * @When /^I multiSelectOpen "([^"]*)"$/
      */
     public function IMultiSelectOpen( $field ) {
 
@@ -328,9 +281,55 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $this->getSession()->wait( 5000, "$('.select2-result-selectable').length > 0" );
     }
 
+
+    /**
+     * for Testing atoms work
+     *
+     * @When /^I should see a select2option "([^"]*)"$/
+     */
+    public function IShouldSeeSelectOption( $value ) {
+
+        // This bit keeps it active until the selector is gone.
+        $link = $this->spin( function( $context ) use ( $value ) {
+                $link = $this->getSession()->getPage()->find(
+                    'css', 'div.select2-result-label:contains(' .  $value . ')'
+                );
+                return $link;
+            } );
+
+        if ( is_null( $link) ) {
+            throw new \Exception( 'Could not find the select2 option: '.$value );
+        }
+    }
+
+
     /**
      *
      *
+     * @Given /^I select2 search for "([^"]*)"$/
+     */
+    public function iSelect2SearchFor( $arg1 ) {
+        $element = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
+        if ( is_null( $element ) ) {
+            throw new \Exception( 'Could not find the active select2 input' );
+        }
+        $element->setValue( $arg1 );
+    }
+
+    /**
+     * @Given /^I select2Multi for "([^"]*)"$/
+     */
+    public function iSelect2MultiSearchFor( $arg1 ) {
+        $element = $this->getSession()->getPage()->find( 'css', '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input' );
+        if ( is_null( $element ) ) {
+            throw new \Exception( 'Could not find the open select2Multi input' );
+        }
+        $element->setValue( $arg1 );
+    }
+
+
+
+    /**
      * @When /^I wait (\d+) ms$/
      */
     public function IWait( $ms ) {
