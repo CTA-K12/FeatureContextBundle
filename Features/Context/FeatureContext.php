@@ -228,7 +228,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     * @When /^I multiSelectAjax"([^"]*)" from "([^"]*)"$/
+     * @When /^I multiSelectAjax "([^"]*)" from "([^"]*)"$/
      */
     public function IMultiSelectAJAX( $value, $field ) {
 
