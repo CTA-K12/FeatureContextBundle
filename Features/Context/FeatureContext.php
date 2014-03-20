@@ -6,10 +6,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareInterface;
 use Behat\MinkExtension\Context\MinkContext;
 
-use Behat\Behat\Context\BehatContext,
-Behat\Behat\Exception\PendingException;
-use Behat\Gherkin\Node\PyStringNode,
-Behat\Gherkin\Node\TableNode;
+use Behat\Behat\Context\BehatContext;
+use Behat\Behat\Exception\PendingException;
+use Behat\Gherkin\Node\PyStringNode;
+use Behat\Gherkin\Node\TableNode;
 
 //
 // Require 3rd-party libraries here:
@@ -125,6 +125,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function ISelectOpen( $field ) {
         $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > a' )->click();
+        $this->IWaitForSelect2ToPopulate();
     }
 
     /**
@@ -150,7 +151,12 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @When /^I wait for select2 to populate$/
      */
     public function IWaitForSelect2ToPopulate() {
-        $this->getSession()->wait( 5000, "$('.select2-searching').length < 1" );
+        $this->spin( function( $context ) {
+                $link = $this->getSession()->getPage()->find(
+                    'css', '.select2-searching'
+                );
+                return !$link;
+            } );
     }
 
     /**
@@ -252,16 +258,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         }
         $control->click();
 
-        // $this->getSession()->wait( 5000, "$('.select2-searching').length > 0" );
-        // $this->getSession()->wait( 5000, "$('.select2-result-selectable').length > 0" );
 
-        $this->spin( function( $context ) {
-                $searching = $this->getSession()->getPage()
-                ->find( 'css', 'li.select2-searching' );
-                return !$searching ;
-            }
-        );
-
+        $this->IWaitForSelect2ToPopulate();
 
         // enter search
         $input = $this->getSession()->getPage()->find( 'css', '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input' );
@@ -299,8 +297,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             throw new \Exception( 'Could not find the active select2 input' );
         }
         $control->click();
-        $this->getSession()->wait( 5000, "$('.select2-searching').length > 0" );
-        $this->getSession()->wait( 5000, "$('.select2-result-selectable').length > 0" );
+        $this->IWaitForSelect2ToPopulate();
     }
 
 
@@ -324,6 +321,27 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         }
     }
 
+    /**
+     * for Testing atoms work
+     *
+     * @When /^I should not see a select2option "([^"]*)"$/
+     */
+    public function IShouldNotSeeSelectOption( $value ) {
+
+        // This bit keeps it active until the selector is gone.
+        $link = $this->spin( function( $context ) use ( $value ) {
+                $link = $this->getSession()->getPage()->find(
+                    'css', 'div.select2-result-label:contains(' .  $value . ')'
+                );
+                if ( $link ) {var_dump( $link->getText() );}
+                return !$link;
+            } );
+
+        // if ( is_null( $link ) ) {
+        //     throw new \Exception( 'Could not find the select2 option: '.$value );
+        // }
+    }
+
 
     /**
      *
@@ -331,9 +349,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @Given /^I select2 search for "([^"]*)"$/
      */
     public function iSelect2SearchFor( $arg1 ) {
-        if ( is_null( $element ) ) {
-            throw new \Exception( 'Could not find the active select2 input' );
-        }
         $search = null;
         $this->spin( function( $context ) use ( &$search ) {
                 $search = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
@@ -341,8 +356,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             }
         );
 
-        if ( is_null( $search  ) ) {
-            throw new \Exception( 'Could not find the open select2Multi input' );
+        if ( is_null( $search ) ) {
+            throw new \Exception( 'Could not find the active select2 input' );
         }
 
         $search ->setValue( $arg1 );
