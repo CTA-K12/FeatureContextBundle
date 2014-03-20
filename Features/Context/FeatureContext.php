@@ -251,8 +251,17 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             throw new \Exception( 'Could not find the active select2 input' );
         }
         $control->click();
-        $this->getSession()->wait( 5000, "$('.select2-searching').length > 0" );
-        $this->getSession()->wait( 5000, "$('.select2-result-selectable').length > 0" );
+
+        // $this->getSession()->wait( 5000, "$('.select2-searching').length > 0" );
+        // $this->getSession()->wait( 5000, "$('.select2-result-selectable').length > 0" );
+
+        $this->spin( function( $context ) {
+                $searching = $this->getSession()->getPage()
+                ->find( 'css', 'li.select2-searching' );
+                return !$searching ;
+            }
+        );
+
 
         // enter search
         $input = $this->getSession()->getPage()->find( 'css', '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input' );
