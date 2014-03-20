@@ -322,24 +322,57 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @Given /^I select2 search for "([^"]*)"$/
      */
     public function iSelect2SearchFor( $arg1 ) {
-        $element = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
         if ( is_null( $element ) ) {
             throw new \Exception( 'Could not find the active select2 input' );
         }
-        $element->setValue( $arg1 );
+        $search = null;
+        $this->spin( function( $context ) use ( &$search ) {
+                $search = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
+                return $search ;
+            }
+        );
+
+        if ( is_null( $search  ) ) {
+            throw new \Exception( 'Could not find the open select2Multi input' );
+        }
+
+        $search ->setValue( $arg1 );
+
+        $this->spin( function( $context ) {
+                $searching = $this->getSession()->getPage()
+                ->find( 'css', 'li.select2-searching' );
+                return !$searching ;
+            }
+        );
     }
 
     /**
      *
      *
-     * @Given /^I select2Multi for "([^"]*)"$/
+     * @Given /^I select2Multi search for "([^"]*)"$/
      */
     public function iSelect2MultiSearchFor( $arg1 ) {
-        $element = $this->getSession()->getPage()->find( 'css', '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input' );
-        if ( is_null( $element ) ) {
+
+        $search = null;
+        $this->spin( function( $context ) use ( &$search ) {
+                $search = $this->getSession()->getPage()
+                ->find( 'css', '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input' );
+                return $search ;
+            }
+        );
+
+        if ( is_null( $search  ) ) {
             throw new \Exception( 'Could not find the open select2Multi input' );
         }
-        $element->setValue( $arg1 );
+
+        $search ->setValue( $arg1 );
+
+        $this->spin( function( $context ) {
+                $searching = $this->getSession()->getPage()
+                ->find( 'css', 'li.select2-searching' );
+                return !$searching ;
+            }
+        );
     }
 
 
