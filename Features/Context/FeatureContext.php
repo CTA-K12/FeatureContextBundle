@@ -1100,53 +1100,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $this->getSession()->getDriver()->resizeWindow( 480, 600, 'current' );
     }
 
-    /**
-     *
-     *
-     * @When /^I should be told the current month$/
-     */
-    public function IShouldBeToldTheCurrentMonth() {
-        $month = new \DateTime();
-        $year  = new \DateTime();
-        $month = $month->format( 'F' );
-        $year  = $year->format( 'Y' );
-
-        $this->spin( function( $context ) use ( &$month ) {
-                $formMonth = $this->getSession()->getPage()->find( 'css', 'span.ui-datepicker-month' );
-                if ( $formMonth ) { $formMonth = $formMonth->getText(); }
-                return $formMonth == $month;
-            } );
-
-        $this->spin( function( $context ) use ( &$year ) {
-                $formYear = $this->getSession()->getPage()->find( 'css', 'span.ui-datepicker-year' );
-                if ( $formYear ) { $formYear = $formYear->getText(); }
-                return $formYear == $year;
-            } );
-    }
-
-    /**
-     *
-     *
-     * @When /^I should be told the current date$/
-     */
-    public function IShouldBeToldTheCurrentDate() {
-        $date = new \DateTime();
-        $date = $date->format( 'm/d/Y' );
-
-        $this->spin( function( $context ) use ( $date ) {
-                return $date;
-            } );
-    }
-
-    /**
-     * @Given /^I press enter$/
-     */
-    public function pressEnter()
-    {
-        $input = $this->getSession()->getPage()->find('css', "input#mesd_ormed_ormedbundle_logtype_dateOfService");
-        $input->keyPress(13,'');
-    }
-
     //
     // Place your definition and hook methods here:
     //
