@@ -26,6 +26,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     private $kernel;
     private $parameters;
 
+    private $logspin = 0;
+
     /**
      * Initializes context with parameters from behat.yml.
      *
@@ -52,6 +54,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
     public function spin( $lambda, $wait = 200 ) {
         for ( $i = 0; $i < $wait; $i++ ) {
+            if ( $this->logspin && $i > 0 ) {var_dump( 'Spin: '.$i );}
             try {
                 if ( $lambda( $this ) ) {
                     return true;
@@ -72,6 +75,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
 
     /**
+     *
+     *
      * @Given /^I do nothing$/
      */
     public function IDoNothing() {
@@ -176,6 +181,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
 
     /**
+     *
+     *
      * @When /^I deselectMulti "([^"]*)" from "([^"]*)"$/
      */
     public function IDeselectMulti( $value, $field ) {
@@ -199,6 +206,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @When /^I deselect "([^"]*)"$/
      */
     public function IDeselect( $field ) {
@@ -206,7 +215,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $close->click();
     }
 
-/**
+    /**
+     *
+     *
      * @When /^I selectAjax "([^"]*)" from "([^"]*)"$/
      */
     public function ISelectAJAX( $value, $field ) {
@@ -228,6 +239,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @When /^I multiSelectAjax "([^"]*)" from "([^"]*)"$/
      */
     public function IMultiSelectAJAX( $value, $field ) {
@@ -297,7 +310,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                 return $link;
             } );
 
-        if ( is_null( $link) ) {
+        if ( is_null( $link ) ) {
             throw new \Exception( 'Could not find the select2 option: '.$value );
         }
     }
@@ -317,6 +330,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Given /^I select2Multi for "([^"]*)"$/
      */
     public function iSelect2MultiSearchFor( $arg1 ) {
@@ -330,6 +345,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
 
     /**
+     *
+     *
      * @When /^I wait (\d+) ms$/
      */
     public function IWait( $ms ) {
@@ -1061,7 +1078,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      * @Given /^I resize to tablet$/
      */
-    public function iResizeToTablet() {
+    public function IResizeToTablet() {
         $this->getSession()->getDriver()->resizeWindow( 920, 1200, 'current' );
     }
 
@@ -1070,7 +1087,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      * @Given /^I resize to full$/
      */
-    public function iResizeToFull() {
+    public function IResizeToFull() {
         $this->getSession()->getDriver()->resizeWindow( 1600, 900, 'current' );
     }
 
@@ -1079,8 +1096,55 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      * @Given /^I resize to mobile$/
      */
-    public function iResizeToMobile() {
+    public function IResizeToMobile() {
         $this->getSession()->getDriver()->resizeWindow( 480, 600, 'current' );
+    }
+
+    /**
+     *
+     *
+     * @When /^I should be told the current month$/
+     */
+    public function IShouldBeToldTheCurrentMonth() {
+        $month = new \DateTime();
+        $year  = new \DateTime();
+        $month = $month->format( 'F' );
+        $year  = $year->format( 'Y' );
+
+        $this->spin( function( $context ) use ( &$month ) {
+                $formMonth = $this->getSession()->getPage()->find( 'css', 'span.ui-datepicker-month' );
+                if ( $formMonth ) { $formMonth = $formMonth->getText(); }
+                return $formMonth == $month;
+            } );
+
+        $this->spin( function( $context ) use ( &$year ) {
+                $formYear = $this->getSession()->getPage()->find( 'css', 'span.ui-datepicker-year' );
+                if ( $formYear ) { $formYear = $formYear->getText(); }
+                return $formYear == $year;
+            } );
+    }
+
+    /**
+     *
+     *
+     * @When /^I should be told the current date$/
+     */
+    public function IShouldBeToldTheCurrentDate() {
+        $date = new \DateTime();
+        $date = $date->format( 'm/d/Y' );
+
+        $this->spin( function( $context ) use ( $date ) {
+                return $date;
+            } );
+    }
+
+    /**
+     * @Given /^I press enter$/
+     */
+    public function pressEnter()
+    {
+        $input = $this->getSession()->getPage()->find('css', "input#mesd_ormed_ormedbundle_logtype_dateOfService");
+        $input->keyPress(13,'');
     }
 
     //
