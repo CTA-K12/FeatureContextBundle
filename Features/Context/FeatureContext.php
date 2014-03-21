@@ -509,8 +509,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @Then /^I should see current month$/
      */
     public function IShouldSeeCurrentMonth() {
@@ -525,8 +523,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @Then /^I should not see current month$/
      */
     public function IShouldNotSeeCurrentMonth() {
@@ -553,6 +549,14 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                 return $this->getSession()->getPage()->find( 'css', '#calendar-loading.hidden' );
             }
         );
+    }
+
+    /**
+     *  @When /^I load calendar "(.*?)"$/
+     */
+    public function LoadCalendar( $link ) {
+        parent::clickLink( $link );
+        $this->WaitForCalendar();
     }
 
     /**
@@ -1204,7 +1208,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      * @Given /^I click on id "([^"]*)"$/
      */
-    public function iClickId( $arg1 ) {
+    public function IClickId( $arg1 ) {
         $element = $this->getSession()->getPage()->find( 'css', '#' . $arg1 );
         if ( is_null( $element ) ) {
             throw new \Exception( 'Could not find the element with id ' . $arg1 );
