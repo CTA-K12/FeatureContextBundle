@@ -52,17 +52,22 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     // Tries condition every 5 ms for 200 cycles
     // catches exceptions until time limit, then fails
 
-    public function spin( $lambda, $wait = 200 ) {
+    public function spin( $lambda, $wait = 5000 ) {
         for ( $i = 0; $i < $wait; $i++ ) {
-            if ( $this->logspin && $i > 0 ) {var_dump( 'Spin: '.$i );}
+            if ( $this->logspin > 1 && $i > 0 ) {
+                print_r( 'Spin iteration:'.$i."\n" );
+            }
             try {
                 if ( $lambda( $this ) ) {
+                    if ( $this->logspin && $i > 0 ) {
+                        print_r( 'Spin: '.$i.' ms '."\n" );
+                    }
                     return true;
                 }
             } catch ( \Exception $e ) {
                 // do nothing
             }
-            usleep( 5000 );
+            usleep( 1000 );
         }
 
         $backtrace = debug_backtrace();
@@ -99,24 +104,79 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function clickLink( $link ) {
         parent::clickLink( $link );
         if ( 'Edit' == $link ) {
-            $this->spin( function( $context ) {
-                    $selected = $this->getSession()->getPage()->find( 'css', '#footer' );
-                    // print_r( $selected->getHTML() );
-                    return $selected;
-                } );
-            $i = 0;
-            $divs = $this->getSession()->getPage()->findAll( 'css', 'div.s2 > a.select2-choice > span' );
-            while ( $i < 1000 && $divs != array() ) {
-                $divs = array_filter( $divs, function( $e ) {
-                        return !$e->getHTML();
-                    } );
-
-                $i++;
-                usleep( 1000 );
-            }
+            $this->waitForAllSelects( 0 );
         }
     }
 
+    /**
+     * Ajax loading can be slow.  Wait for it here.
+     *
+     * @When I wait for single selects$/
+     */
+
+    public function waitForSingleSelects() {
+        $this->spin( function( $context ) {
+                $selected = $this->getSession()->getPage()->find( 'css', '#footer' );
+                return $selected;
+            } );
+        $i = 0;
+        // singles
+        $divs = $this->getSession()->getPage()->findAll( 'css', 'div.s2 > a.select2-choice > span' );
+        while ( $i < 5000 && $divs != array() ) {
+            $divs = array_filter( $divs, function( $e ) {
+                    if ( $e ) {
+                        // print_r( $e->getHTML()."\n" );
+                    }
+                    return !$e->getHTML();
+                } );
+
+            $i++;
+            usleep( 1000 );
+        }
+    }
+
+    /**
+     * Ajax loading can be slow.  Wait for it here.
+     *
+     * @When I wait for multiple selects$/
+     */
+
+    public function waitForMultipleSelects() {
+        $this->spin( function( $context ) {
+                $element = $this->getSession()->getPage()->find( 'css', 'div.select2-loading' );
+                return !$element;
+            }
+        );
+
+        //multis
+        $divs = $this->getSession()->getPage()
+        ->findAll( 'css',
+            'div.select2-container.select2-container-multi.s2 > ul.select2-choices > li.select2-search-choice' );
+        $i = 0;
+        while ( $i < 5000 && $divs != array() ) {
+            $divs = array_filter( $divs, function( $e ) {
+                    if ( $e ) {
+                        // print_r( $e->getHTML() );
+                    }
+                    return !$e->getHTML();
+                } );
+
+            $i++;
+            usleep( 1000 );
+        }
+    }
+
+    /**
+     * Ajax loading can be slow.  Wait for it here.
+     *
+     * @When /^I wait for all selects$/
+     */
+
+    public function waitForAllSelects() {
+
+        $this->waitForSingleSelects();
+        $this->waitForMultipleSelects();
+    }
 
     /**
      *
@@ -438,13 +498,14 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @When /^I reset the grid$/
      */
     public function gridReset() {
-        $this->spin( function( $context ) {
-                $this->getSession()
+        $reset = null;
+        $this->spin( function( $context ) use ( $reset ) {
+                $reset = $this->getSession()
                 ->getPage()
-                ->find( 'css', 'button.reset' )
-                ->click();
-                return true;
+                ->find( 'css', 'button.reset' );
+                return $reset;
             } );
+        $reset->click();
     }
 
     /**
@@ -480,20 +541,48 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *  @When /^I wait for calendar$/
+     */
+    public function WaitForCalendar() {
+        $this->spin( function( $context ) {
+                return !$this->getSession()->getPage()->find( 'css', '#appointment-calendar.hidden' );
+            }
+        );
+
+        $this->spin( function( $context ) {
+                return $this->getSession()->getPage()->find( 'css', '#calendar-loading.hidden' );
+            }
+        );
+    }
+
+    /**
      *  @When /^I click on the middle of the month$/
      */
     public function IClickOnTheMiddleOfTheMonth() {
+        $this->WaitForCalendar();
+
         $today = new \DateTime();
         $timestamp = $this->getSession()->getPage()->find( 'css', '#calendar-info-time' )->getHtml();
         $today->setTimestamp( intval( $timestamp ) );
         $ymd = $today->format( 'Y-m-' ) . '15';
-        $day = $this->getSession()->getPage()->find( 'css', '#calendar-day-items-' . $ymd );
-        try {
-            $day->click();
-        }
-        catch ( \Exception $e ) {
-            throw new \Exception( 'Could not find the day to click on' );
-        }
+
+        $mid = null;
+        $this->spin( function( $context ) use ( $ymd, &$mid ) {
+                $mid = $this->getSession()->getPage()->find( 'css', '#calendar-day-items-' . $ymd );
+                return $mid;
+            } ) ;
+
+        $mid->click();
+
+        $this->waitForAllSelects();
+
+        // $day = $this->getSession()->getPage()->find( 'css', '#calendar-day-items-' . $ymd );
+        // try {
+        //     $day->click();
+        // }
+        // catch ( \Exception $e ) {
+        //     throw new \Exception( 'Could not find the day to click on' );
+        // }
     }
 
     /**
