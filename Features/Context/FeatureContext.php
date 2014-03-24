@@ -302,6 +302,11 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             throw new \Exception( 'Could not find ' . $value . ' in the select2 dropdown list' );
         }
         $element->click();
+
+        $this->spin( function( $context ) use ( $value ) {
+                return !$this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $value . ')' );
+            }
+        );
     }
 
     /**
@@ -393,7 +398,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                 $link = $this->getSession()->getPage()->find(
                     'css', 'div.select2-result-label:contains(' .  $value . ')'
                 );
-                if ( $link ) {var_dump( $link->getText() );}
                 return !$link;
             } );
 
@@ -509,6 +513,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Then /^I should see current month$/
      */
     public function IShouldSeeCurrentMonth() {
@@ -523,6 +529,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Then /^I should not see current month$/
      */
     public function IShouldNotSeeCurrentMonth() {
@@ -531,15 +539,23 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $date = $this->getSession()->getPage()->find( 'css', '.calendar-date' );
         if ( $date != null ) {
             throw new \Exception(
-                'The date for the calendar is the current date'
+                'The date for the calendar is the current date and is not expect to be'
             );
         }
     }
 
     /**
-     *  @When /^I wait for calendar$/
+     *  @When /^I load calendar "(.*?)"$/
      */
-    public function WaitForCalendar() {
+    public function ILoadCalendar( $link ) {
+        parent::clickLink( $link );
+        $this->WaitForCalendar();
+    }
+
+    /**
+     *  @When /^I wait for appointment calendar$/
+     */
+    public function IWaitForAppointmentCalendar() {
         $this->spin( function( $context ) {
                 return !$this->getSession()->getPage()->find( 'css', '#appointment-calendar.hidden' );
             }
@@ -552,11 +568,38 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *  @When /^I load calendar "(.*?)"$/
+     *  @When /^I wait for dhc calendar$/
      */
-    public function LoadCalendar( $link ) {
-        parent::clickLink( $link );
-        $this->WaitForCalendar();
+    public function IWaitForDHCCalendar() {
+        $this->spin( function( $context ) {
+                return !$this->getSession()->getPage()->find( 'css', '.button-pushed' );
+            }
+        );
+
+
+        $this->spin( function( $context ) {
+                return $this->getSession()->getPage()->find( 'css', '#delegatedhealthcare-calendar' );
+            }
+        );
+
+        $this->spin( function( $context ) {
+                return $this->getSession()->getPage()->find( 'css', 'span.calendar-date-display' );
+            }
+        );
+
+
+    }
+
+    /**
+     *  @When /^I save dhc calendar$/
+     */
+    public function SaveDHCCalendar( ) {
+        $this->getSession()->getPage()->find( 'css', '#save-calendar' )->click();
+
+        $this->spin( function( $context ) {
+                return $this->getSession()->getPage()->find( 'css', '#calendar-messages > .alert-success' );
+            }
+        );
     }
 
     /**
@@ -1219,9 +1262,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             throw new \Exception( 'Found element with id ' . $arg1 . ' but could not click on it' );
         }
     }
-
-
-
 
     /**
      *
