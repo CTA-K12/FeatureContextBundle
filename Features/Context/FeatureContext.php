@@ -93,7 +93,17 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      * @Then /^I acknowledge Lighthart is awesome$/
      */
-    public function iAcknowledgeLighthartIsAwesome() {
+    public function IAcknowledgeLighthartIsAwesome() {
+    }
+
+    /**
+     *  @When /^I wait for button to unpush$/
+     */
+    public function IButtonToUnpush() {
+        $this->spin( function( $context ) {
+                return !$this->getSession()->getPage()->find( 'css', '.button-pushed' );
+            }
+        );
     }
 
     /**
@@ -621,7 +631,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             }
         );
 
-
         $this->spin( function( $context ) {
                 return $this->getSession()->getPage()->find( 'css', '#ride-calendar' );
             }
@@ -632,7 +641,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             }
         );
     }
-
 
     /**
      *  @When /^I generate dhc logs$/
