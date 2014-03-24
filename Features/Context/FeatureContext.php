@@ -549,7 +549,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function ILoadCalendar( $link ) {
         parent::clickLink( $link );
-        $this->WaitForCalendar();
+        $this->IWaitForAppointmentCalendar();
     }
 
     /**
@@ -586,8 +586,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                 return $this->getSession()->getPage()->find( 'css', 'span.calendar-date-display' );
             }
         );
-
-
     }
 
     /**
@@ -603,10 +601,62 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *  @When /^I save ride calendar$/
+     */
+    public function SaveRideCalendar( ) {
+        $this->getSession()->getPage()->find( 'css', '#save-calendar' )->click();
+
+        $this->spin( function( $context ) {
+                return $this->getSession()->getPage()->find( 'css', '#calendar-messages > .alert-success' );
+            }
+        );
+    }
+
+    /**
+     *  @When /^I wait for ride calendar$/
+     */
+    public function IWaitForRideCalendar() {
+        $this->spin( function( $context ) {
+                return !$this->getSession()->getPage()->find( 'css', '.button-pushed' );
+            }
+        );
+
+
+        $this->spin( function( $context ) {
+                return $this->getSession()->getPage()->find( 'css', '#ride-calendar' );
+            }
+        );
+
+        $this->spin( function( $context ) {
+                return $this->getSession()->getPage()->find( 'css', 'span.calendar-date-display' );
+            }
+        );
+    }
+
+
+    /**
+     *  @When /^I generate dhc logs$/
+     */
+    public function IGenerateDHCLogs( ) {
+        $this->getSession()->getPage()->find( 'css', '#generate-log' )->click();
+
+        $this->spin( function( $context ) {
+                return $this->getSession()->getPage()->find( 'css', '#calendar-messages > .alert-success' );
+            }
+        );
+
+        $this->spin( function( $context ) {
+                return !$this->getSession()->getPage()->find( 'css', '.icon-spinner' );
+            }
+        );
+
+    }
+
+    /**
      *  @When /^I click on the middle of the month$/
      */
     public function IClickOnTheMiddleOfTheMonth() {
-        $this->WaitForCalendar();
+        $this->IWaitForAppointmentCalendar();
 
         $today = new \DateTime();
         $timestamp = $this->getSession()->getPage()->find( 'css', '#calendar-info-time' )->getHtml();
