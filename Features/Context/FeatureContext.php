@@ -499,7 +499,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function gridReset() {
         $reset = null;
-        $this->spin( function( $context ) use ( $reset ) {
+        $this->spin( function( $context ) use ( &$reset ) {
                 $reset = $this->getSession()
                 ->getPage()
                 ->find( 'css', 'button.reset' );
