@@ -85,7 +85,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @Given /^I do nothing$/
      */
     public function IDoNothing() {
-
     }
 
     /**
@@ -113,6 +112,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function clickLink( $link ) {
         parent::clickLink( $link );
+
         if ( 'Edit' == $link ) {
             $this->waitForAllSelects( 0 );
         }
@@ -321,6 +321,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                 return !$this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $value . ')' );
             }
         );
+        $this->IClickHeader();
     }
 
     /**
@@ -329,8 +330,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @When /^I multiSelectAjax "([^"]*)" from "([^"]*)"$/
      */
     public function IMultiSelectAJAX( $value, $field ) {
-
-        $this->spin( function( $context ) use ( $value ) {
+        $this->spin( function( $context ) use ( $field) {
                 return $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' );
             }
         );
@@ -366,7 +366,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         }
 
         //change focus
-        $this->getSession()->getPage()->find( 'css', 'h1' )->click();
+        $this->IClickHeader();
     }
 
     /**
