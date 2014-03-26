@@ -331,7 +331,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IMultiSelectAJAX( $value, $field ) {
 
         $this->spin( function( $context ) use ( $value ) {
-                return !$this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' );
+                return $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' );
             }
         );
 
