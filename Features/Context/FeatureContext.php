@@ -299,6 +299,10 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function ISelectAJAX( $value, $field ) {
         $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > a' )->click();
 
+        $this->spin( function( $context ) use ( $value ) {
+                return $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
+            }
+        );
 
         $element = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
         if ( is_null( $element ) ) {
@@ -325,6 +329,12 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @When /^I multiSelectAjax "([^"]*)" from "([^"]*)"$/
      */
     public function IMultiSelectAJAX( $value, $field ) {
+
+        $this->spin( function( $context ) use ( $value ) {
+                return !$this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' );
+            }
+        );
+
 
         // click field
         $control = $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' );
@@ -422,7 +432,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      * @Given /^I select2 search for "([^"]*)"$/
      */
-    public function iSelect2SearchFor( $arg1 ) {
+    public function ISelect2SearchFor( $arg1 ) {
         $search = null;
         $this->spin( function( $context ) use ( &$search ) {
                 $search = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
@@ -449,7 +459,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      * @Given /^I select2Multi search for "([^"]*)"$/
      */
-    public function iSelect2MultiSearchFor( $arg1 ) {
+    public function ISelect2MultiSearchFor( $arg1 ) {
 
         $search = null;
         $this->spin( function( $context ) use ( &$search ) {
@@ -473,7 +483,20 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         );
     }
 
+    /**
+     *
+     *
+     * @When /^I save plan$/
+     */
+    public function ISavePlan( ) {
+        $this->getSession()->getPage()->find( 'css', '#save-plan' )->click();
 
+        $this->spin( function( $context ) {
+                $element = $this->getSession()->getPage()->find( 'css', 'div.flash-notice' );
+                $element = $this->getSession()->getPage()->find( 'css', 'div.alert-success:contains(\'Plan saved.\')' );
+                return $element;
+            } );
+    }
 
     /**
      *
@@ -613,7 +636,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     /**
      *  @When /^I save ride calendar$/
      */
-    public function SaveRideCalendar( ) {
+    public function ISaveRideCalendar( ) {
         $this->getSession()->getPage()->find( 'css', '#save-calendar' )->click();
 
         $this->spin( function( $context ) {
