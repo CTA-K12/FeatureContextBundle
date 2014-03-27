@@ -49,7 +49,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
 
     // Waits for itm to be true.
-    // Tries condition every 5 ms for 200 cycles
+    // Tries condition every 1 ms for 5000 cycles
     // catches exceptions until time limit, then fails
 
     public function spin( $lambda, $wait = 5000 ) {
@@ -80,8 +80,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
 
     /**
-     *
-     *
      * @Given /^I do nothing$/
      */
     public function IDoNothing() {
@@ -96,6 +94,32 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     * Clicks link with specified id|title|alt|text.
+     *
+     * @When /^(?:|I )goto "(?P<link>(?:[^"]|\\")*)"$/
+     */
+    public function IClickLink( $link ) {
+        parent::clickLink( $link );
+
+        if ( 'Edit' == $link ) {
+            $this->waitForAllSelects( 0 );
+        }
+    }
+
+
+    /**
+     * Just to defocus
+     *
+     * @When /^I click header$/
+     */
+    public function IClickHeader( ) {
+        $this->getSession()->getPage()->find( 'css', 'h1' )->click();
+    }
+
+    /**
+     *
+     *  This is used for select2 forms associated with Calendaers
+     *
      *  @When /^I wait for button to unpush$/
      */
     public function IButtonToUnpush() {
@@ -106,17 +130,17 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     * Clicks link with specified id|title|alt|text.
+     * Ajax loading can be slow.  Wait for it here.
      *
-     * @When /^(?:|I )goto "(?P<link>(?:[^"]|\\")*)"$/
+     * @When /^I wait for all selects$/
      */
-    public function clickLink( $link ) {
-        parent::clickLink( $link );
 
-        if ( 'Edit' == $link ) {
-            $this->waitForAllSelects( 0 );
-        }
+    public function waitForAllSelects() {
+
+        $this->waitForSingleSelects();
+        $this->waitForMultipleSelects();
     }
+
 
     /**
      * Ajax loading can be slow.  Wait for it here.
@@ -176,20 +200,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         }
     }
 
-    /**
-     * Ajax loading can be slow.  Wait for it here.
-     *
-     * @When /^I wait for all selects$/
-     */
-
-    public function waitForAllSelects() {
-
-        $this->waitForSingleSelects();
-        $this->waitForMultipleSelects();
-    }
 
     /**
-     *
+     * Open a select box to see a list of items.
      *
      * @When /^I selectOpen "([^"]*)"$/
      */
@@ -200,6 +213,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
     /**
      * Deprecated
+     * features/User.feature uses this.
+     * Eliminate after rewrites.
      *
      * @When /^I click on select2Multi "([^"]*)"$/
      */
@@ -207,16 +222,11 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' )->click();
     }
 
+
     /**
-     * Just to defocus
-     *
-     * @When /^I click header$/
-     */
-    public function IClickHeader( ) {
-        $this->getSession()->getPage()->find( 'css', 'h1' )->click();
-    }
-    /**
-     * For singles
+     * Deprecated
+     * features/StudentMerge.feature
+     * Eliminate after rewrite
      *
      * @When /^I wait for select2 to populate$/
      */
@@ -231,33 +241,47 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
     /**
      * Deprecated
+     * May be eliminated
      *
      * @When /^I click on select2 item "([^"]*)"$/
      */
-    public function IClickOnSelect2Item( $item ) {
-        $element = $this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $item . ')' );
-        if ( is_null( $element ) ) {
-            throw new \Exception( 'Could not find ' . $item . ' in the select2 dropdown list' );
-        }
-        $element->click();
-    }
+    // public function IClickOnSelect2Item( $item ) {
+    //     $element = $this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $item . ')' );
+    //     if ( is_null( $element ) ) {
+    //         throw new \Exception( 'Could not find ' . $item . ' in the select2 dropdown list' );
+    //     }
+    //     $element->click();
+    // }
 
     /**
      * Deprecated
+     * May be eliminated
      *
      * @When /^I selectOpenMulti item "([^"]*)"$/
      */
-    public function ISelectOpenMultiItem( $item ) {
-        $element = $this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $item . ')' );
-        if ( is_null( $element ) ) {
-            throw new \Exception( 'Could not find ' . $item . ' in the select2 dropdown list' );
-        }
-        $element->click();
-    }
+    // public function ISelectOpenMultiItem( $item ) {
+    //     $element = $this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $item . ')' );
+    //     if ( is_null( $element ) ) {
+    //         throw new \Exception( 'Could not find ' . $item . ' in the select2 dropdown list' );
+    //     }
+    //     $element->click();
+    // }
 
 
     /**
+     * For select2 boxes, to uncheck items-- single selects
+     * @When /^I deselect "([^"]*)"$/
+     */
+    public function IDeselect( $field ) {
+        $close = $this->getSession()->getPage()->find( 'css', 'div#'.$field.'> a > .select2-search-choice-close' );
+        $close->click();
+    }
+
+    /**
+     * For select2 boxes, to uncheck items-- multiselects
      *
+     * TODO: Add checks for flags to behat features don't need
+     * to check css classes
      *
      * @When /^I deselectMulti "([^"]*)" from "([^"]*)"$/
      */
@@ -281,17 +305,10 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             } );
     }
 
-    /**
-     *
-     *
-     * @When /^I deselect "([^"]*)"$/
-     */
-    public function IDeselect( $field ) {
-        $close = $this->getSession()->getPage()->find( 'css', 'div#'.$field.'> a > .select2-search-choice-close' );
-        $close->click();
-    }
 
     /**
+     * TODO: Add checks for flags to behat features don't need
+     * to check css classes
      *
      *
      * @When /^I selectAjax "([^"]*)" from "([^"]*)"$/
@@ -325,7 +342,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
+     * TODO: Add checks for flags to behat features don't need
+     * to check css classes
      *
      * @When /^I multiSelectAjax "([^"]*)" from "([^"]*)"$/
      */
@@ -428,7 +446,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
 
     /**
-     *
+     * for Testing atoms work and other users
      *
      * @Given /^I select2 search for "([^"]*)"$/
      */
@@ -455,7 +473,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
+     * for Testing atoms work and other users
      *
      * @Given /^I select2Multi search for "([^"]*)"$/
      */
@@ -484,7 +502,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
+     * each form should probably have its own one of these
+     * key part is the spin function to wait for form to process
+     * which tells us when page is reloaded
      *
      * @When /^I save plan$/
      */
@@ -499,8 +519,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @When /^I wait (\d+) ms$/
      */
     public function IWait( $ms ) {
@@ -508,7 +526,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
+     * For angrid
      *
      * @When /^I grid search for "(.+?)"$/
      */
@@ -530,7 +548,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
+     * For angrid
      *
      * @When /^I reset the grid$/
      */
@@ -622,6 +640,26 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *  @When /^I wait for ride calendar$/
+     */
+    public function IWaitForRideCalendar() {
+        $this->spin( function( $context ) {
+                return !$this->getSession()->getPage()->find( 'css', '.button-pushed' );
+            }
+        );
+
+        $this->spin( function( $context ) {
+                return $this->getSession()->getPage()->find( 'css', '#ride-calendar' );
+            }
+        );
+
+        $this->spin( function( $context ) {
+                return $this->getSession()->getPage()->find( 'css', 'span.calendar-date-display' );
+            }
+        );
+    }
+
+    /**
      *  @When /^I save dhc calendar$/
      */
     public function SaveDHCCalendar( ) {
@@ -641,26 +679,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
         $this->spin( function( $context ) {
                 return $this->getSession()->getPage()->find( 'css', '#calendar-messages > .alert-success' );
-            }
-        );
-    }
-
-    /**
-     *  @When /^I wait for ride calendar$/
-     */
-    public function IWaitForRideCalendar() {
-        $this->spin( function( $context ) {
-                return !$this->getSession()->getPage()->find( 'css', '.button-pushed' );
-            }
-        );
-
-        $this->spin( function( $context ) {
-                return $this->getSession()->getPage()->find( 'css', '#ride-calendar' );
-            }
-        );
-
-        $this->spin( function( $context ) {
-                return $this->getSession()->getPage()->find( 'css', 'span.calendar-date-display' );
             }
         );
     }
@@ -1345,8 +1363,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @Given /^I resize to tablet$/
      */
     public function IResizeToTablet() {
@@ -1354,8 +1370,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @Given /^I resize to full$/
      */
     public function IResizeToFull() {
@@ -1363,8 +1377,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @Given /^I resize to mobile$/
      */
     public function IResizeToMobile() {
