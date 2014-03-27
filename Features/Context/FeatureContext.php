@@ -80,6 +80,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
 
     /**
+     *
+     *
      * @Given /^I do nothing$/
      */
     public function IDoNothing() {
@@ -117,7 +119,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
      *  This is used for select2 forms associated with Calendaers
      *
      *  @When /^I wait for button to unpush$/
@@ -200,7 +201,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         }
     }
 
-
     /**
      * Open a select box to see a list of items.
      *
@@ -208,13 +208,222 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function ISelectOpen( $field ) {
         $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > a' )->click();
+
+        $this->IWaitForSelect2ToOpen( $field );
         $this->IWaitForSelect2ToPopulate();
     }
 
     /**
+     * for Testing atoms work
+     *
+     * @When /^I multiSelectOpen "([^"]*)"$/
+     */
+    public function IMultiSelectOpen( $field ) {
+
+        // click field
+        $control = $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' );
+        if ( is_null( $control ) ) {
+            throw new \Exception( 'Could not find the active select2 input' );
+        }
+        $control->click();
+        $this->IWaitForSelect2ToPopulate();
+    }
+
+
+    /**
+     * for Testing atoms work
+     *
+     * @When /^I should see a select2option "([^"]*)"$/
+     */
+    public function IShouldSeeSelectOption( $value ) {
+
+        // This bit keeps it active until the selector is gone.
+        $link = $this->spin( function( $context ) use ( $value ) {
+                $link = $this->getSession()->getPage()->find(
+                    'css', 'div.select2-result-label:contains(' .  $value . ')'
+                );
+                return $link;
+            } );
+
+        if ( is_null( $link ) ) {
+            throw new \Exception( 'Could not find the select2 option: '.$value );
+        }
+    }
+
+    /**
+     * for Testing atoms work
+     *
+     * @When /^I should not see a select2option "([^"]*)"$/
+     */
+    public function IShouldNotSeeSelectOption( $value ) {
+
+        // This bit keeps it active until the selector is gone.
+        $link = $this->spin( function( $context ) use ( $value ) {
+                $link = $this->getSession()->getPage()->find(
+                    'css', 'div.select2-result-label:contains(' .  $value . ')'
+                );
+                return !$link;
+            } );
+
+        // if ( is_null( $link ) ) {
+        //     throw new \Exception( 'Could not find the select2 option: '.$value );
+        // }
+    }
+
+    /**
+     * for Testing atoms work
+     *
+     * @When /^I should see a select2option "([^"]*)" chosen from "([^"]*)"$/
+     */
+    public function IShouldSeeSelectOptionChosen( $value, $field ) {
+        $this->spin( function( $context ) use ( $value, $field ) {
+                $element = $this->getSession()->getPage()->find( 'css',
+                    'div#' .$field. ' > a.select2-choice'.' > span:contains("' .  $value . '")'
+                );
+                return $element;
+            }
+        );
+    }
+
+    /**
+     * for Testing atoms work
+     *
+     * @When /^I should not see a select2option "([^"]*)" chosen from "([^"]*)"$/
+     */
+    public function IShouldNotSeeSelectOptionChosen( $value, $field ) {
+        $this->spin( function( $context ) use ( $value, $field ) {
+                $element = $this->getSession()->getPage()->find( 'css',
+                    'div#' .$field. ' > a.select2-choice'.' > span:contains("' .  $value . '")'
+                );
+                return !$element;
+            }
+        );
+    }
+
+    /**
+     * for Testing atoms work
+     *
+     * @When /^I should see a multiSelect2option "([^"]*)" chosen from "([^"]*)"$/
+     */
+    public function IShouldSeeMultiSelectOptionChosen( $value, $field ) {
+        $this->spin( function( $context ) use ( $value, $field ) {
+                $element = $this->getSession()->getPage()->find( 'css',
+                    'div#' .$field. ' > ul.select2-choices > li.select2-search-choice'.' > div:contains("' .  $value . '")'
+                );
+                return $element;
+            }
+        );
+    }
+
+    /**
+     * for Testing atoms work
+     *
+     * @When /^I should not see a multiSelect2option "([^"]*)" chosen from "([^"]*)"$/
+     */
+    public function IShouldNotSeeMultiSelectOptionChosen( $value, $field ) {
+        $this->spin( function( $context ) use ( $value, $field ) {
+                $element = $this->getSession()->getPage()->find( 'css',
+                    'div#' .$field. ' > ul.select2-choices > li.select2-search-choice'.' > div:contains("' .  $value . '")'
+                );
+                return !$element;
+            }
+        );
+    }
+
+    /**
+     * for Testing atoms work and other users
+     *
+     * @Given /^I select2 search for "([^"]*)"$/
+     */
+    public function ISelect2SearchFor( $value ) {
+        $search = null;
+        $this->spin( function( $context ) use ( &$search ) {
+                $search = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
+                return $search ;
+            }
+        );
+
+        if ( is_null( $search ) ) {
+            throw new \Exception( 'Could not find the active select2 input' );
+        }
+
+        $search ->setValue( $value );
+        $this->spin( function( $context ) {
+                $searching = $this->getSession()->getPage()
+                ->find( 'css', 'li.select2-searching' );
+                return !$searching ;
+            }
+        );
+
+        $link = null;
+
+        $this->spin( function( $context ) use ( &$link, $value ) {
+
+                // ajax and non-ajax lists have slightly different css classes.
+
+                $link = $this->getSession()->getPage()->find( 'css', '.select2-match:contains("'.$value.'")' );
+                if (!$link) {
+                    $link = $this->getSession()->getPage()->find( 'css', '.select2-result-label:contains("'.$value.'")' );
+                }
+                return $link ;
+            }
+        );
+
+        $link->click();
+    }
+
+    /**
+     * for Testing atoms work and other users
+     *
+     * @Given /^I select2Multi search for "([^"]*)"$/
+     */
+    public function ISelect2MultiSearchFor( $value ) {
+
+        $search = null;
+        $this->spin( function( $context ) use ( &$search ) {
+                $search = $this->getSession()->getPage()
+                ->find( 'css', '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input' );
+                return $search ;
+            }
+        );
+
+        if ( is_null( $search  ) ) {
+            throw new \Exception( 'Could not find the open select2Multi input' );
+        }
+
+        $search->setValue( $value );
+
+        $this->spin( function( $context ) {
+                $searching = $this->getSession()->getPage()
+                ->find( 'css', 'li.select2-searching' );
+                return !$searching ;
+            }
+        );
+    }
+
+    /**
+     * for Testing atoms work
+     *
+     * @When /^I should see a multiSelect2 search option "([^"]*)"$/
+     */
+    public function IShouldSeeMultiSelectSearchOption( $value ) {
+        $this->spin( function( $context ) use ( $value ) {
+                $link = $this->getSession()->getPage()->find( 'css',
+                    'div.select2-drop-multi > ul.select2-results > li.select2-result > div.select2-result-label:contains(' .  $value . ')'
+                );
+                return $link;
+            } );
+    }
+
+
+
+    /**
      * Deprecated
      * features/User.feature uses this.
-     * Eliminate after rewrites.
+     * switch to private after rewrites.
+     * use these instead:
+     * ISelectAJAX, IMultiSelectAJAX
+     * ISelectOpen, IMultiSelectOpen
      *
      * @When /^I click on select2Multi "([^"]*)"$/
      */
@@ -224,57 +433,14 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
 
     /**
-     * Deprecated
-     * features/StudentMerge.feature
-     * Eliminate after rewrite
-     *
-     * @When /^I wait for select2 to populate$/
-     */
-    public function IWaitForSelect2ToPopulate() {
-        $this->spin( function( $context ) {
-                $link = $this->getSession()->getPage()->find(
-                    'css', '.select2-searching'
-                );
-                return !$link;
-            } );
-    }
-
-    /**
-     * Deprecated
-     * May be eliminated
-     *
-     * @When /^I click on select2 item "([^"]*)"$/
-     */
-    // public function IClickOnSelect2Item( $item ) {
-    //     $element = $this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $item . ')' );
-    //     if ( is_null( $element ) ) {
-    //         throw new \Exception( 'Could not find ' . $item . ' in the select2 dropdown list' );
-    //     }
-    //     $element->click();
-    // }
-
-    /**
-     * Deprecated
-     * May be eliminated
-     *
-     * @When /^I selectOpenMulti item "([^"]*)"$/
-     */
-    // public function ISelectOpenMultiItem( $item ) {
-    //     $element = $this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $item . ')' );
-    //     if ( is_null( $element ) ) {
-    //         throw new \Exception( 'Could not find ' . $item . ' in the select2 dropdown list' );
-    //     }
-    //     $element->click();
-    // }
-
-
-    /**
      * For select2 boxes, to uncheck items-- single selects
+     *
      * @When /^I deselect "([^"]*)"$/
      */
     public function IDeselect( $field ) {
         $close = $this->getSession()->getPage()->find( 'css', 'div#'.$field.'> a > .select2-search-choice-close' );
         $close->click();
+        $this->IWaitForSelect2ToBeOffscreen( $field );
     }
 
     /**
@@ -348,7 +514,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @When /^I multiSelectAjax "([^"]*)" from "([^"]*)"$/
      */
     public function IMultiSelectAJAX( $value, $field ) {
-        $this->spin( function( $context ) use ( $field) {
+        $this->spin( function( $context ) use ( $field ) {
                 return $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' );
             }
         );
@@ -360,7 +526,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             throw new \Exception( 'Could not find the active select2 input' );
         }
         $control->click();
-
 
         $this->IWaitForSelect2ToPopulate();
 
@@ -388,118 +553,93 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     * for Testing atoms work
+     * TODO: Add checks for flags to behat features don't need
+     * to check css classes
      *
-     * @When /^I multiSelectOpen "([^"]*)"$/
+     * @When /^I multiSelectAjax search result "([^"]*)" from "([^"]*)"$/
      */
-    public function IMultiSelectOpen( $field ) {
-
-        // click field
-        $control = $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' );
-        if ( is_null( $control ) ) {
-            throw new \Exception( 'Could not find the active select2 input' );
-        }
-        $control->click();
-        $this->IWaitForSelect2ToPopulate();
-    }
-
-
-    /**
-     * for Testing atoms work
-     *
-     * @When /^I should see a select2option "([^"]*)"$/
-     */
-    public function IShouldSeeSelectOption( $value ) {
-
-        // This bit keeps it active until the selector is gone.
-        $link = $this->spin( function( $context ) use ( $value ) {
-                $link = $this->getSession()->getPage()->find(
-                    'css', 'div.select2-result-label:contains(' .  $value . ')'
+    public function IMultiSelectSearchResultAJAX( $value, $field ) {
+        $link = null;
+        $this->spin( function( $context ) use ( $value, &$link ) {
+                $link = $this->getSession()->getPage()->find( 'css',
+                    'div.select2-drop-multi > ul.select2-results > li.select2-result > div.select2-result-label:contains(' .  $value . ')'
                 );
                 return $link;
             } );
+        $link->click();
 
-        if ( is_null( $link ) ) {
-            throw new \Exception( 'Could not find the select2 option: '.$value );
-        }
+        //change focus
+        $this->IClickHeader();
+        $this->IWaitForMultiSelect2ToBeOffscreen( $field );
     }
 
     /**
-     * for Testing atoms work
-     *
-     * @When /^I should not see a select2option "([^"]*)"$/
+     * Not for external use
      */
-    public function IShouldNotSeeSelectOption( $value ) {
-
-        // This bit keeps it active until the selector is gone.
-        $link = $this->spin( function( $context ) use ( $value ) {
+    private function IWaitForSelect2ToPopulate() {
+        $this->spin( function( $context ) {
                 $link = $this->getSession()->getPage()->find(
-                    'css', 'div.select2-result-label:contains(' .  $value . ')'
+                    'css', '.select2-searching'
                 );
                 return !$link;
             } );
-
-        // if ( is_null( $link ) ) {
-        //     throw new \Exception( 'Could not find the select2 option: '.$value );
-        // }
     }
 
-
     /**
-     * for Testing atoms work and other users
-     *
-     * @Given /^I select2 search for "([^"]*)"$/
+     * Not for external use
      */
-    public function ISelect2SearchFor( $arg1 ) {
-        $search = null;
-        $this->spin( function( $context ) use ( &$search ) {
-                $search = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
-                return $search ;
+    private function IWaitForSelect2ToOpen( $field ) {
+        $this->spin( function( $context ) use ( $field ) {
+                $element = $this->getSession()->getPage()->find( 'css', 'div.select2-drop-active' );
+                return $element;
             }
         );
 
-        if ( is_null( $search ) ) {
-            throw new \Exception( 'Could not find the active select2 input' );
-        }
+        $this->spin( function( $context ) use ( $field ) {
+                $element = $this->getSession()->getPage()->find( 'css', 'div.select2-drop-active.select2-offscreen' );
+                return !$element;
+            }
+        );
 
-        $search ->setValue( $arg1 );
-
-        $this->spin( function( $context ) {
-                $searching = $this->getSession()->getPage()
-                ->find( 'css', 'li.select2-searching' );
-                return !$searching ;
+        $this->spin( function( $context ) use ( $field ) {
+                $element = $this->getSession()->getPage()->find( 'css', 'div#' . $field . '.select2-dropdown-open' );
+                return $element;
             }
         );
     }
 
     /**
-     * for Testing atoms work and other users
-     *
-     * @Given /^I select2Multi search for "([^"]*)"$/
+     * Not for external use
      */
-    public function ISelect2MultiSearchFor( $arg1 ) {
-
-        $search = null;
-        $this->spin( function( $context ) use ( &$search ) {
-                $search = $this->getSession()->getPage()
-                ->find( 'css', '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input' );
-                return $search ;
-            }
-        );
-
-        if ( is_null( $search  ) ) {
-            throw new \Exception( 'Could not find the open select2Multi input' );
-        }
-
-        $search ->setValue( $arg1 );
-
-        $this->spin( function( $context ) {
-                $searching = $this->getSession()->getPage()
-                ->find( 'css', 'li.select2-searching' );
-                return !$searching ;
+    private function IWaitForSelect2ToBeOffscreen( $field ) {
+        $this->spin( function( $context ) use ( $field ) {
+                $element = $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > div.select2-offscreen' );
+                return $element;
             }
         );
     }
+
+    /**
+     * Not for external use
+     */
+    private function IWaitForMultiSelect2ToBeOffscreen( $field ) {
+        $this->spin( function( $context ) use ( $field ) {
+                $element = $this->getSession()->getPage()->find( 'css',
+                    'div.select2-drop-active.select2-drop-multi'
+                );
+                return !$element;
+            }
+        );
+
+        $this->spin( function( $context ) use ( $field ) {
+                $element = $this->getSession()->getPage()->find( 'css',
+                    'div#' . $field . ' > div.select2-offscreen.select2-container-multi.select2-dropdown-open'
+                );
+                return !$element;
+            }
+        );
+    }
+
 
     /**
      * each form should probably have its own one of these
@@ -519,6 +659,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @When /^I wait (\d+) ms$/
      */
     public function IWait( $ms ) {
@@ -1363,6 +1505,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Given /^I resize to tablet$/
      */
     public function IResizeToTablet() {
@@ -1370,6 +1514,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Given /^I resize to full$/
      */
     public function IResizeToFull() {
@@ -1377,6 +1523,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Given /^I resize to mobile$/
      */
     public function IResizeToMobile() {
