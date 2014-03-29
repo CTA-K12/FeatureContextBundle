@@ -240,7 +240,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         // This bit keeps it active until the selector is gone.
         $link = $this->spin( function( $context ) use ( $value ) {
                 $link = $this->getSession()->getPage()->find(
-                    'css', 'div.select2-result-label:contains(' .  $value . ')'
+                    'css', 'div.select2-result-label:contains("' .  $value . '")'
                 );
                 return $link;
             } );
@@ -258,9 +258,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldNotSeeSelectOption( $value ) {
 
         // This bit keeps it active until the selector is gone.
-        $link = $this->spin( function( $context ) use ( $value ) {
+        $this->spin( function( $context ) use ( $value ) {
                 $link = $this->getSession()->getPage()->find(
-                    'css', 'div.select2-result-label:contains(' .  $value . ')'
+                    'css', 'div.select2-result-label:contains("' .  $value . '")'
                 );
                 return !$link;
             } );
@@ -362,7 +362,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                 // ajax and non-ajax lists have slightly different css classes.
 
                 $link = $this->getSession()->getPage()->find( 'css', '.select2-match:contains("'.$value.'")' );
-                if (!$link) {
+                if ( !$link ) {
                     $link = $this->getSession()->getPage()->find( 'css', '.select2-result-label:contains("'.$value.'")' );
                 }
                 return $link ;
@@ -409,7 +409,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IShouldSeeMultiSelectSearchOption( $value ) {
         $this->spin( function( $context ) use ( $value ) {
                 $link = $this->getSession()->getPage()->find( 'css',
-                    'div.select2-drop-multi > ul.select2-results > li.select2-result > div.select2-result-label:contains(' .  $value . ')'
+                    'div.select2-drop-multi > ul.select2-results > li.select2-result > div.select2-result-label:contains("' .  $value . '")'
                 );
                 return $link;
             } );
@@ -454,7 +454,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IDeselectMulti( $value, $field ) {
         $link = $this->getSession()->getPage()->find(
             'xpath',
-            $this->getSession()->getSelectorsHandler()->selectorToXpath( 'css', 'div#'.$field.'> ul > li.select2-search-choice:contains(' . $value. ') a' )
+            $this->getSession()->getSelectorsHandler()->selectorToXpath( 'css', 'div#'.$field.'> ul > li.select2-search-choice:contains("' . $value. '") a' )
         );
         $link->click();
         $this->getSession()->getPage()->find( 'css', 'h1' )->click();
@@ -465,7 +465,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                     'xpath',
                     $this->getSession()->getSelectorsHandler()
                     ->selectorToXpath( 'css',
-                        'div#'.$field.'> ul > li.select2-search-choice:contains(' . $value. ') a' )
+                        'div#'.$field.'> ul > li.select2-search-choice:contains("' . $value. '") a' )
                 );
                 return !$link;
             } );
@@ -494,14 +494,14 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $element->setValue( $value );
 
         $this->getSession()->wait( 5000, "$('.select2-searching').length < 1" );
-        $element = $this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $value . ')' );
+        $element = $this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains("' . $value . '")' );
         if ( is_null( $element ) ) {
             throw new \Exception( 'Could not find ' . $value . ' in the select2 dropdown list' );
         }
         $element->click();
 
         $this->spin( function( $context ) use ( $value ) {
-                return !$this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains(' . $value . ')' );
+                return !$this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains("' . $value . '")' );
             }
         );
         $this->IClickHeader();
@@ -540,7 +540,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $this->getSession()->wait( 5000, "$('.select2-searching').length < 1" );
 
         // click selector
-        $element = $this->getSession()->getPage()->find( 'css', 'li.select2-result-selectable > div.select2-result-label:contains(' . $value . ')' );
+        $element = $this->getSession()->getPage()->find( 'css', 'li.select2-result-selectable > div.select2-result-label:contains("' . $value . '")' );
 
         if ( is_null( $element ) ) {
             throw new \Exception( 'Could not find ' . $value . ' in the select2 dropdown list; it is probably already selected' );
@@ -562,7 +562,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $link = null;
         $this->spin( function( $context ) use ( $value, &$link ) {
                 $link = $this->getSession()->getPage()->find( 'css',
-                    'div.select2-drop-multi > ul.select2-results > li.select2-result > div.select2-result-label:contains(' .  $value . ')'
+                    'div.select2-drop-multi > ul.select2-results > li.select2-result > div.select2-result-label:contains("' .  $value . '")'
                 );
                 return $link;
             } );
@@ -653,7 +653,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
         $this->spin( function( $context ) {
                 $element = $this->getSession()->getPage()->find( 'css', 'div.flash-notice' );
-                $element = $this->getSession()->getPage()->find( 'css', 'div.alert-success:contains(\'Plan saved.\')' );
+                $element = $this->getSession()->getPage()->find( 'css', 'div.alert-success:contains("Plan saved.")' );
                 return $element;
             } );
     }
@@ -668,11 +668,37 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     * For pushing divs with javascript
+     *
+     * @When /^I push id "(.+?)"$/
+     */
+    public function IPushId( $id ) {
+        $element=null;
+        $this->spin( function( $context ) use ( $id, &$element ) {
+                $element = $this->getSession()->getPage()->find( 'css', '#'.$id );
+                return $element;
+            }
+        );
+
+        $element->click();
+    }
+
+
+    /**
      * For angrid
      *
      * @When /^I grid search for "(.+?)"$/
      */
-    public function gridSearch( $value ) {
+    public function IGridSearch( $value ) {
+        $this->spin( function( $context ) use ( $value ) {
+                $field = $this->getSession()->getPage()->find( 'css',
+                    'input.grid-filter-input-query-from'
+                );
+
+                return $field;
+            } );
+
+
         $this->spin( function( $context ) use ( $value ) {
                 $this->getSession()->getPage()->fillField(
                     $this->getSession()
@@ -694,7 +720,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      * @When /^I reset the grid$/
      */
-    public function gridReset() {
+    public function IGridReset() {
         $reset = null;
         $this->spin( function( $context ) use ( &$reset ) {
                 $reset = $this->getSession()
@@ -703,6 +729,38 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                 return $reset;
             } );
         $reset->click();
+    }
+
+    /**
+     * For angrid
+     *
+     * @When /^I add to caseload$/
+     */
+    public function IAddToCaseLoad() {
+        $this->spin( function( $context ) use ( &$reset ) {
+                $add = $this->getSession()
+                ->getPage()
+                ->find( 'css', '#grid-add-form' );
+
+                $show = $this->getSession()
+                ->getPage()
+                ->find( 'css', '#show-grid-add-form' );
+
+                return $show || $add;
+            }
+        );
+
+        $add = $this->getSession()->getPage()->find( 'css', '#show-grid-add-form' );
+        if ( $add ) {
+            $add->click();
+
+            $this->spin( function( $context ) use ( &$reset ) {
+                    $reset = $this->getSession()
+                    ->getPage()
+                    ->find( 'css', '#grid-add-form' );
+                    return $reset;
+                } );
+        }
     }
 
     /**
