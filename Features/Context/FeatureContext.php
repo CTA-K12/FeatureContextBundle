@@ -480,8 +480,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @When /^I selectAjax "([^"]*)" from "([^"]*)"$/
      */
     public function ISelectAJAX( $value, $field ) {
-        $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > a' )->click();
-
         $this->spin( function( $context ) use ( $value ) {
                 return $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
             }
@@ -498,6 +496,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         if ( is_null( $element ) ) {
             throw new \Exception( 'Could not find ' . $value . ' in the select2 dropdown list' );
         }
+
         $element->click();
 
         $this->spin( function( $context ) use ( $value ) {
@@ -613,8 +612,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     private function IWaitForSelect2ToBeOffscreen( $field ) {
         $this->spin( function( $context ) use ( $field ) {
-                $element = $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > div.select2-offscreen' );
-                return $element;
+                $element = $this->getSession()->getPage()->find( 'css', 'div#select2-drop' );
+                return !$element;
             }
         );
     }
