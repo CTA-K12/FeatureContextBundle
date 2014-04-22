@@ -347,7 +347,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             throw new \Exception( 'Could not find the active select2 input' );
         }
 
-        $search ->setValue( $value );
+        $search->setValue( $value );
         $this->spin( function( $context ) {
                 $searching = $this->getSession()->getPage()
                 ->find( 'css', 'li.select2-searching' );
@@ -482,18 +482,21 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @When /^I selectAjax "([^"]*)" from "([^"]*)"$/
      */
     public function ISelectAJAX( $value, $field ) {
-        $this->spin( function( $context ) use ( $value ) {
-                return $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
+        if ( $this->getSession()->getPage()->find( 'css', '#select2-drop' ) ) {
+        } else {
+            $this->ISelectOpen( $field );
+        }
+
+        $element = null;
+        $this->spin( function( $context ) use ( $value, &$element ) {
+                $element = $this->getSession()->getPage()->find( 'css', '#select2-drop.select2-drop-active > .select2-search > .select2-input' );
+                return $element;
             }
         );
 
-        $element = $this->getSession()->getPage()->find( 'css', '.select2-drop-active > .select2-search > .select2-input' );
-        if ( is_null( $element ) ) {
-            throw new \Exception( 'Could not find the active select2 input' );
-        }
         $element->setValue( $value );
-
         $this->getSession()->wait( 5000, "$('.select2-searching').length < 1" );
+
         $element = $this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains("' . $value . '")' );
         if ( is_null( $element ) ) {
             throw new \Exception( 'Could not find ' . $value . ' in the select2 dropdown list' );
@@ -505,6 +508,12 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                 return !$this->getSession()->getPage()->find( 'css', 'div.select2-result-label:contains("' . $value . '")' );
             }
         );
+
+        $this->spin( function( $context ) use ( $value ) {
+                return !$this->getSession()->getPage()->find( 'css', '#select2-drop' );
+            }
+        );
+
         $this->IClickHeader();
     }
 
@@ -515,15 +524,15 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @When /^I multiSelectAjax "([^"]*)" from "([^"]*)"$/
      */
     public function IMultiSelectAJAX( $value, $field ) {
-        if ( $this->getSession()->getPage()->find( 'css', '#select2-drop' ) ){
+        if ( $this->getSession()->getPage()->find( 'css', '#select2-drop' ) ) {
         } else {
-            $this->IMultiSelectOpen($field);
+            $this->IMultiSelectOpen( $field );
         }
 
         // enter search
         $input = $this->getSession()->getPage()->find( 'css',
-         '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input'
-         );
+            '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input'
+        );
         if ( is_null( $input ) ) {
             throw new \Exception( 'Could not find the active select2 input' );
         }
@@ -536,14 +545,15 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
         $element = null;
         $this->spin( function( $context ) use ( $field, $value, &$element ) {
-                $element = $this->getSession()->getPage()->find('css',
-                        // '#select2-drop > ul > li > div
-                        '.select2-highlighted .select2-result-label:contains("' . $value . '")'
+                $element = $this->getSession()->getPage()->find( 'css',
+                    // '#select2-drop > ul > li > div
+                    '.select2-highlighted .select2-result-label:contains("' . $value . '")'
                 );
                 return $element;
-            } );
+            }
+        );
 
-        // $this->getSession()->wait( 15000 );
+
         if ( is_null( $element ) ) {
             throw new \Exception( 'Could not find ' . $value . ' in the select2 dropdown list; it is probably already selected' );
         } else {
@@ -563,9 +573,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function IMultiSelectSearchResultAJAX( $value, $field ) {
         $element = null;
         $this->spin( function( $context ) use ( $field, $value, &$element ) {
-                $element = $this->getSession()->getPage()->find('css',
-                        // '#select2-drop > ul > li > div
-                        '.select2-highlighted .select2-result-label:contains("' . $value . '")'
+                $element = $this->getSession()->getPage()->find( 'css',
+                    // '#select2-drop > ul > li > div
+                    '.select2-highlighted .select2-result-label:contains("' . $value . '")'
                 );
                 return $element;
             } );
@@ -1549,8 +1559,47 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
+     * @Given /^I fill in date "([^"]*)" with "([^"]*)"$/
+     */
+    public function IPickDate( $field, $date ) {
+        $element = null;
+        $this->spin( function( $context ) use ( $field, &$element ) {
+                $element = $this->getSession()->getPage()->find( 'css',
+                    // '#select2-drop > ul > li > div
+                    'input#'.$field
+                );
+                return $element;
+            }
+        );
+        $element->setValue( $date );
+
+        $element = $this->getSession()->getPage()->find( 'css',
+                    // '#select2-drop > ul > li > div
+                    'input#'.$field
+                );
+
+        $this->IClickHeader();
+    }
+
+
+    /**
+     * @Given /^I should see Date Picker$/
+     */
+    public function ISeeDatePicker() {
+        $element = null;
+        $this->spin( function( $context ) use ( &$element ) {
+                $element = $this->getSession()->getPage()->find( 'css',
+                    // '#select2-drop > ul > li > div
+                    '#ui-datepicker-div'
+                );
+                $style = $element->getAttribute('style');
+                return ( false !== strpos($style, 'block') );
+            }
+        );
+    }
+
+
+    /**
      * @Given /^I click on id "([^"]*)"$/
      */
     public function IClickId( $arg1 ) {
