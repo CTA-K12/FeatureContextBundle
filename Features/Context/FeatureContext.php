@@ -469,6 +469,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                 );
                 return !$link;
             } );
+
+        $this->IClickHeader();
     }
 
 
@@ -513,23 +515,15 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @When /^I multiSelectAjax "([^"]*)" from "([^"]*)"$/
      */
     public function IMultiSelectAJAX( $value, $field ) {
-        $this->spin( function( $context ) use ( $field ) {
-                return $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' );
-            }
-        );
-
-
-        // click field
-        $control = $this->getSession()->getPage()->find( 'css', 'div#' . $field . ' > ul > li > input' );
-        if ( is_null( $control ) ) {
-            throw new \Exception( 'Could not find the active select2 input' );
+        if ( $this->getSession()->getPage()->find( 'css', '#select2-drop' ) ){
+        } else {
+            $this->IMultiSelectOpen($field);
         }
-        $control->click();
-
-        $this->IWaitForSelect2ToPopulate();
 
         // enter search
-        $input = $this->getSession()->getPage()->find( 'css', '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input' );
+        $input = $this->getSession()->getPage()->find( 'css',
+         '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input'
+         );
         if ( is_null( $input ) ) {
             throw new \Exception( 'Could not find the active select2 input' );
         }
@@ -537,10 +531,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
         // wait to populate
         $this->getSession()->wait( 5000, "$('.select2-searching').length < 1" );
-
+        // $this->getSession()->wait( 5000);
         // click selector
-        $element = $this->getSession()->getPage()->find( 'css', 'li.select2-result-selectable > div.select2-result-label:contains("' . $value . '")' );
 
+        $element = null;
+        $this->spin( function( $context ) use ( $field, $value, &$element ) {
+                $element = $this->getSession()->getPage()->find('css',
+                        // '#select2-drop > ul > li > div
+                        '.select2-highlighted .select2-result-label:contains("' . $value . '")'
+                );
+                return $element;
+            } );
+
+        // $this->getSession()->wait( 15000 );
         if ( is_null( $element ) ) {
             throw new \Exception( 'Could not find ' . $value . ' in the select2 dropdown list; it is probably already selected' );
         } else {
@@ -558,18 +561,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @When /^I multiSelectAjax search result "([^"]*)" from "([^"]*)"$/
      */
     public function IMultiSelectSearchResultAJAX( $value, $field ) {
-        $link = null;
-        $this->spin( function( $context ) use ( $value, &$link ) {
-                $link = $this->getSession()->getPage()->find( 'css',
-                    'div.select2-drop-multi > ul.select2-results > li.select2-result > div.select2-result-label:contains("' .  $value . '")'
+        $element = null;
+        $this->spin( function( $context ) use ( $field, $value, &$element ) {
+                $element = $this->getSession()->getPage()->find('css',
+                        // '#select2-drop > ul > li > div
+                        '.select2-highlighted .select2-result-label:contains("' . $value . '")'
                 );
-                return $link;
+                return $element;
             } );
-        $link->click();
+        $element->click();
 
         //change focus
         $this->IClickHeader();
-        $this->IWaitForMultiSelect2ToBeOffscreen( $field );
+        // $this->IWaitForMultiSelect2ToBeOffscreen( $field );
     }
 
     /**
