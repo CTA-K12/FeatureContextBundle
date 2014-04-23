@@ -191,7 +191,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         while ( $i < 5000 && $divs != array() ) {
             $divs = array_filter( $divs, function( $e ) {
                     if ( $e ) {
-                        // print_r( $e->getHTML() );
+                        print_r( $e->getHTML() );
                     }
                     return !$e->getHTML();
                 } );
@@ -453,24 +453,24 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function IDeselectMulti( $value, $field ) {
         $link = $this->getSession()->getPage()->find(
-            'xpath',
-            $this->getSession()->getSelectorsHandler()->selectorToXpath( 'css', 'div#'.$field.'> ul > li.select2-search-choice:contains("' . $value. '") a' )
+             'css' ,
+                'div#'.$field.'> ul > li.select2-search-choice:contains("' . $value. '") a'
         );
         $link->click();
-        $this->getSession()->getPage()->find( 'css', 'h1' )->click();
 
         // This bit keeps it active until the selector is gone.
         $this->spin( function( $context ) use ( $field, $value ) {
                 $link = $this->getSession()->getPage()->find(
-                    'xpath',
-                    $this->getSession()->getSelectorsHandler()
-                    ->selectorToXpath( 'css',
-                        'div#'.$field.'> ul > li.select2-search-choice:contains("' . $value. '") a' )
+                    'css' ,
+                    'div#'.$field.'> ul > li.select2-search-choice:contains("' . $value. '") a'
                 );
                 return !$link;
-            } );
+            }
+        );
 
-        $this->IClickHeader();
+        // print_r($this->getSession()->getPage()->getHTML());die;
+
+        // $this->IClickHeader();
     }
 
 
@@ -533,9 +533,11 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $input = $this->getSession()->getPage()->find( 'css',
             '.select2-dropdown-open > .select2-choices > .select2-search-field > .select2-input'
         );
+
         if ( is_null( $input ) ) {
             throw new \Exception( 'Could not find the active select2 input' );
         }
+
         $input->setValue( $value );
 
         // wait to populate
@@ -553,7 +555,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             }
         );
 
-
         if ( is_null( $element ) ) {
             throw new \Exception( 'Could not find ' . $value . ' in the select2 dropdown list; it is probably already selected' );
         } else {
@@ -561,7 +562,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         }
 
         //change focus
-        $this->IClickHeader();
+        // $this->IClickHeader();
     }
 
     /**
@@ -932,7 +933,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             } ) ;
 
         $mid->click();
-
         $this->waitForAllSelects();
 
         // $day = $this->getSession()->getPage()->find( 'css', '#calendar-day-items-' . $ymd );
@@ -1559,6 +1559,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Given /^I fill in date "([^"]*)" with "([^"]*)"$/
      */
     public function IPickDate( $field, $date ) {
@@ -1574,15 +1576,17 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $element->setValue( $date );
 
         $element = $this->getSession()->getPage()->find( 'css',
-                    // '#select2-drop > ul > li > div
-                    'input#'.$field
-                );
+            // '#select2-drop > ul > li > div
+            'input#'.$field
+        );
 
         $this->IClickHeader();
     }
 
 
     /**
+     *
+     *
      * @Given /^I should see Date Picker$/
      */
     public function ISeeDatePicker() {
@@ -1592,14 +1596,16 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                     // '#select2-drop > ul > li > div
                     '#ui-datepicker-div'
                 );
-                $style = $element->getAttribute('style');
-                return ( false !== strpos($style, 'block') );
+                $style = $element->getAttribute( 'style' );
+                return false !== strpos( $style, 'block' );
             }
         );
     }
 
 
     /**
+     *
+     *
      * @Given /^I click on id "([^"]*)"$/
      */
     public function IClickId( $arg1 ) {
