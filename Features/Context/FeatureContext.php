@@ -244,7 +244,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                 );
                 return $link;
             }
-            );
+        );
 
         if ( is_null( $link ) ) {
             throw new \Exception( 'Could not find the select2 option: '.$value );
@@ -1634,6 +1634,41 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function IResizeToMobile() {
         $this->getSession()->getDriver()->resizeWindow( 480, 600, 'current' );
+    }
+
+    /**
+     * @Given /^I should see active link "([^"]*)"$/
+     */
+    public function IShouldSeeActiveLink( $text ) {
+        $this->spin(
+            function( $context ) use ( $text ) {
+                $element = $this->getSession()->getPage()->find( 'css' ,
+                    'li.active > a:contains("'.$text.'")'
+                );
+
+                return $element;
+            }
+        );
+    }
+
+    /**
+     * @Given /^I should not see active link "([^"]*)"$/
+     *
+     * Be careful with this one, link names
+     * can be similar and we are looking for
+     * partial match
+     *
+     */
+    public function IShouldNotSeeActiveLink( $text ) {
+        $this->spin(
+            function( $context ) use ( $text ) {
+                $element = $this->getSession()->getPage()->find( 'css' ,
+                    'li.active > a:contains("'.$text.'")'
+                );
+
+                return !$element;
+            }
+        );
     }
 
     //
