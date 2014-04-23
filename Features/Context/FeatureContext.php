@@ -191,7 +191,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         while ( $i < 5000 && $divs != array() ) {
             $divs = array_filter( $divs, function( $e ) {
                     if ( $e ) {
-                        print_r( $e->getHTML() );
+                        // print_r( $e->getHTML() );
                     }
                     return !$e->getHTML();
                 } );
