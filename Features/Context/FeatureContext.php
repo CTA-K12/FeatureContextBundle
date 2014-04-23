@@ -137,7 +137,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
 
     public function waitForAllSelects() {
-
         $this->waitForSingleSelects();
         $this->waitForMultipleSelects();
     }
@@ -178,7 +177,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
     public function waitForMultipleSelects() {
         $this->spin( function( $context ) {
-                $element = $this->getSession()->getPage()->find( 'css', 'div.select2-loading' );
+                $element = $this->getSession()->getPage()->find( 'css', 'input.select2-loading' );
                 return !$element;
             }
         );
@@ -186,7 +185,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         //multis
         $divs = $this->getSession()->getPage()
         ->findAll( 'css',
-            'div.select2-container.select2-container-multi.s2 > ul.select2-choices > li.select2-search-choice' );
+            'div.select2-container.select2-container-multi.s2 > ul.select2-choices > li.select2-search-choice'
+        );
         $i = 0;
         while ( $i < 5000 && $divs != array() ) {
             $divs = array_filter( $divs, function( $e ) {
@@ -453,8 +453,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function IDeselectMulti( $value, $field ) {
         $link = $this->getSession()->getPage()->find(
-             'css' ,
-                'div#'.$field.'> ul > li.select2-search-choice:contains("' . $value. '") a'
+            'css' ,
+            'div#'.$field.'> ul > li.select2-search-choice:contains("' . $value. '") a'
         );
         $link->click();
 
