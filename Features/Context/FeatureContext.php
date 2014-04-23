@@ -243,7 +243,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                     'css', 'div.select2-result-label:contains("' .  $value . '")'
                 );
                 return $link;
-            } );
+            }
+            );
 
         if ( is_null( $link ) ) {
             throw new \Exception( 'Could not find the select2 option: '.$value );
@@ -604,20 +605,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     private function IWaitForSelect2ToOpen( $field ) {
         $this->spin( function( $context ) use ( $field ) {
-                $element = $this->getSession()->getPage()->find( 'css', 'div.select2-drop-active' );
-                return $element;
-            }
-        );
-
-        $this->spin( function( $context ) use ( $field ) {
-                $element = $this->getSession()->getPage()->find( 'css', 'div.select2-drop-active.select2-offscreen' );
+                $element = $this->getSession()->getPage()->find( 'css', 'input.select2-drop-active' );
                 return !$element;
-            }
-        );
-
-        $this->spin( function( $context ) use ( $field ) {
-                $element = $this->getSession()->getPage()->find( 'css', 'div#' . $field . '.select2-dropdown-open' );
-                return $element;
             }
         );
     }
