@@ -1671,6 +1671,27 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         );
     }
 
+    /**
+     * @Given /^I click sidebar "([^"]*)"$/
+     *
+     * Be careful with this one, link names
+     * can be similar and we are looking for
+     * partial match
+     *
+     */
+    public function IClickSidebar( $text ) {
+        $this->spin(
+            function( $context ) use ( $text ) {
+                $element = $this->getSession()->getPage()->find( 'css' ,
+                    'div.sidebar a:contains("'.$text.'")'
+                );
+
+                return !$element->click();
+            }
+        );
+    }
+
+
     //
     // Place your definition and hook methods here:
     //
