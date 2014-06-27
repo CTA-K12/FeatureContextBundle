@@ -652,7 +652,10 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @When /^I save plan$/
      */
     public function ISavePlan( ) {
-        $this->getSession()->getPage()->find( 'css', '#save-plan' )->click();
+
+        $save = $this->getSession()->getPage()->find( 'css', '#save-plan' );
+        $save->focus();
+        $save->click();
 
         $this->spin( function( $context ) {
                 $element = $this->getSession()->getPage()->find( 'css', 'div.flash-notice' );
