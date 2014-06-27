@@ -1615,7 +1615,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @Given /^I resize to tablet$/
      */
     public function IResizeToTablet() {
-        $this->getSession()->getDriver()->resizeWindow( 920, 1200, 'current' );
+        $this->getSession()->getDriver()->resizeWindow( 920, 1100, 'current' );
     }
 
     /**
@@ -1624,7 +1624,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @Given /^I resize to full$/
      */
     public function IResizeToFull() {
-        $this->getSession()->getDriver()->resizeWindow( 1600, 900, 'current' );
+        $this->getSession()->getDriver()->resizeWindow( 1600, 850, 'current' );
     }
 
     /**
