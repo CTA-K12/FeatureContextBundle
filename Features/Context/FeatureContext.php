@@ -1686,7 +1686,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $this->spin(
             function( $context ) use ( $text ) {
                 $element = $this->getSession()->getPage()->find( 'css' ,
-                    'div.sidebar a:contains("'.$text.'")'
+                    'aside.sidebar a:contains("'.$text.'")'
                 );
 
                 return !$element->click();
