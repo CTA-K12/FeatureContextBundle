@@ -177,6 +177,13 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
     public function waitForMultipleSelects() {
         $this->spin( function( $context ) {
+                $element = $this->getSession()->getPage()->find( 'css', 'input.select2-offscreen' );
+                return $element;
+            }
+        );
+
+
+        $this->spin( function( $context ) {
                 $element = $this->getSession()->getPage()->find( 'css', 'input.select2-loading' );
                 return !$element;
             }
@@ -187,6 +194,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         ->findAll( 'css',
             'div.select2-container.select2-container-multi.s2 > ul.select2-choices > li.select2-search-choice'
         );
+        // print_r($this->getSession()->getPage()->getHTML());die;
         $i = 0;
         while ( $i < 5000 && $divs != array() ) {
             $divs = array_filter( $divs, function( $e ) {
@@ -1683,15 +1691,18 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      */
     public function IClickSidebar( $text ) {
+        $element = null;
         $this->spin(
-            function( $context ) use ( $text ) {
+            function( $context ) use ( $text, &$element ) {
                 $element = $this->getSession()->getPage()->find( 'css' ,
                     'aside.sidebar a:contains("'.$text.'")'
                 );
 
-                return !$element->click();
+                return $element;
             }
         );
+
+        $element->click();
     }
 
 
