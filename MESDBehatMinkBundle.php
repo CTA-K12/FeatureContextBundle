@@ -1,6 +1,6 @@
 <?php
 
-namespace MESD\Behat\MinkBundle;
+namespace Mesd\Behat\MinkBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

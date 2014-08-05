@@ -1,6 +1,6 @@
 <?php
 
-namespace MESD\Behat\MinkBundle\Features\Context;
+namespace Mesd\Behat\MinkBundle\Features\Context;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareInterface;

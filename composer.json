@@ -4,7 +4,7 @@
     "type": "symfony-bundle",
     "description": "Feature Context bundle",
     "autoload": {
-        "psr-0": { "MESD\\Behat\\MinkBundle": "" }
+        "psr-0": { "Mesd\\Behat\\MinkBundle": "" }
     },
-    "target-dir": "MESD/Behat/MinkBundle"
+    "target-dir": "Mesd/Behat/MinkBundle"
 }
