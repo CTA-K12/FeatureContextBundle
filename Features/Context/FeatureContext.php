@@ -848,7 +848,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         );
 
         $this->spin( function( $context ) {
-                return $this->getSession()->getPage()->find( 'css', 'span.calendar-date-display' );
+                return $this->getSession()->getPage()->find( 'css', 'div.calendar-date-display' );
             }
         );
     }
@@ -868,7 +868,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         );
 
         $this->spin( function( $context ) {
-                return $this->getSession()->getPage()->find( 'css', 'span.calendar-date-display' );
+                return $this->getSession()->getPage()->find( 'css', 'div.calendar-date-display' );
             }
         );
     }
