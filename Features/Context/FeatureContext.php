@@ -661,15 +661,15 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function ISavePlan( ) {
 
-        $save = $this->getSession()->getPage()->find( 'css', '#save-plan' );
+        $save = $this->getSession()->getPage()->find( 'css', '#mesd_ormedbundle_plantype_submit_widget > button' );
         $save->focus();
         $save->click();
 
         $this->spin( function( $context ) {
-                $element = $this->getSession()->getPage()->find( 'css', 'div.flash-notice' );
                 $element = $this->getSession()->getPage()->find( 'css', 'div.alert-success:contains("Plan saved.")' );
                 return $element;
-            } );
+            }
+        );
     }
 
     /**
@@ -1648,6 +1648,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Given /^I should see active link "([^"]*)"$/
      */
     public function IShouldSeeActiveLink( $text ) {
@@ -1663,6 +1665,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Given /^I should not see active link "([^"]*)"$/
      *
      * Be careful with this one, link names
@@ -1683,6 +1687,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Given /^I click sidebar "([^"]*)"$/
      *
      * Be careful with this one, link names
