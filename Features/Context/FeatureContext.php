@@ -73,8 +73,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $backtrace = debug_backtrace();
 
         throw new \Exception(
-            "Timeout thrown by " . $backtrace[1]['class'] . "::" . $backtrace[1]['function'] . "()\n" .
-            $backtrace[1]['file'] . ", line " . $backtrace[1]['line']
+            "Timeout thrown by " . $backtrace[1]['class'] . "::" . $backtrace[1]['function'] . "()\n"
+            // $backtrace[1]['file'] . ", line " . $backtrace[1]['line']
         );
     }
 
@@ -1687,6 +1687,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Given /^I click sidebar "([^"]*)"$/
      *
      * Be careful with this one, link names
@@ -1710,6 +1712,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     *
+     *
      * @Given /^I open sidebar$/
      *
      * Be careful with this one, link names
@@ -1740,24 +1744,26 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             }
         );
 
-        if ($sidebar->hasClass('sidebar-closed')) {
+        if ( $sidebar->hasClass( 'sidebar-closed' ) ) {
             $handle->doubleClick();
+            $this->spin(
+                function( $context ) {
+                    $element = $this->getSession()->getPage()->find( 'css' ,
+                        '.sidebar-open'
+                    );
+
+                    return $element;
+                }
+            );
         } else {
         }
 
-        $this->spin(
-            function( $context ) {
-                $element = $this->getSession()->getPage()->find( 'css' ,
-                    '.sidebar-open'
-                );
-
-                return $element;
-            }
-        );
 
     }
 
     /**
+     *
+     *
      * @Given /^I close sidebar$/
      *
      * Be careful with this one, link names
@@ -1788,20 +1794,19 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             }
         );
 
-        if ($sidebar->hasClass('sidebar-open')) {
+        if ( $sidebar->hasClass( 'sidebar-open' ) ) {
             $handle->doubleClick();
+            $this->spin(
+                function( $context ) {
+                    $element = $this->getSession()->getPage()->find( 'css' ,
+                        '.sidebar-closed'
+                    );
+
+                    return $element;
+                }
+            );
         } else {
         }
-
-        $this->spin(
-            function( $context ) {
-                $element = $this->getSession()->getPage()->find( 'css' ,
-                    '.sidebar-closed'
-                );
-
-                return $element;
-            }
-        );
     }
 
     //
