@@ -1687,8 +1687,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     *
-     *
      * @Given /^I click sidebar "([^"]*)"$/
      *
      * Be careful with this one, link names
@@ -1711,6 +1709,100 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $element->click();
     }
 
+    /**
+     * @Given /^I open sidebar$/
+     *
+     * Be careful with this one, link names
+     * can be similar and we are looking for
+     * partial match
+     *
+     */
+    public function IOpenSidebar() {
+        $sidebar = null;
+        $this->spin(
+            function( $context ) use ( &$sidebar ) {
+                $sidebar = $this->getSession()->getPage()->find( 'css' ,
+                    'aside.sidebar'
+                );
+
+                return $sidebar;
+            }
+        );
+
+        $handle = null;
+        $this->spin(
+            function( $context ) use ( &$handle ) {
+                $handle = $this->getSession()->getPage()->find( 'css' ,
+                    'div.drag-bar-handle'
+                );
+
+                return $handle;
+            }
+        );
+
+        if ($sidebar->hasClass('sidebar-closed')) {
+            $handle->doubleClick();
+        } else {
+        }
+
+        $this->spin(
+            function( $context ) {
+                $element = $this->getSession()->getPage()->find( 'css' ,
+                    '.sidebar-open'
+                );
+
+                return $element;
+            }
+        );
+
+    }
+
+    /**
+     * @Given /^I close sidebar$/
+     *
+     * Be careful with this one, link names
+     * can be similar and we are looking for
+     * partial match
+     *
+     */
+    public function ICloseSidebar() {
+        $sidebar = null;
+        $this->spin(
+            function( $context ) use ( &$sidebar ) {
+                $sidebar = $this->getSession()->getPage()->find( 'css' ,
+                    'aside.sidebar'
+                );
+
+                return $sidebar;
+            }
+        );
+
+        $handle = null;
+        $this->spin(
+            function( $context ) use ( &$handle ) {
+                $handle = $this->getSession()->getPage()->find( 'css' ,
+                    'div.drag-bar-handle'
+                );
+
+                return $handle;
+            }
+        );
+
+        if ($sidebar->hasClass('sidebar-open')) {
+            $handle->doubleClick();
+        } else {
+        }
+
+        $this->spin(
+            function( $context ) {
+                $element = $this->getSession()->getPage()->find( 'css' ,
+                    '.sidebar-closed'
+                );
+
+                return $element;
+            }
+        );
+    }
 
     //
     // Place your definition and hook methods here:
