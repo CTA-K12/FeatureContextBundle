@@ -1716,10 +1716,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      * @Given /^I open sidebar$/
      *
-     * Be careful with this one, link names
-     * can be similar and we are looking for
-     * partial match
-     *
      */
     public function IOpenSidebar() {
         $sidebar = null;
@@ -1744,7 +1740,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             }
         );
 
-        if ( $sidebar->hasClass( 'sidebar-closed' ) ) {
+        if ( !$sidebar->hasClass( 'sidebar-open' ) ) {
             $handle->doubleClick();
             $this->spin(
                 function( $context ) {
@@ -1757,18 +1753,12 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             );
         } else {
         }
-
-
     }
 
     /**
      *
      *
      * @Given /^I close sidebar$/
-     *
-     * Be careful with this one, link names
-     * can be similar and we are looking for
-     * partial match
      *
      */
     public function ICloseSidebar() {
