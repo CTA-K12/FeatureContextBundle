@@ -154,6 +154,14 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
                 return $selected;
             } );
         $i = 0;
+
+
+        $this->spin( function( $context ) {
+                $element = $this->getSession()->getPage()->find( 'css', 'input.select2-loading' );
+                return !$element;
+            }
+        );
+
         // singles
         $divs = $this->getSession()->getPage()->findAll( 'css', 'div.s2 > a.select2-choice > span' );
         while ( $i < 5000 && $divs != array() ) {
