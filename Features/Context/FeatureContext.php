@@ -1847,7 +1847,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         /**
      *
      *
-     * @Given /^I should see an new button$/
+     * @Given /^I should see a new button$/
      *
      */
     public function ISeeNew() {
@@ -1865,7 +1865,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     /**
      *
      *
-     * @Given /^I should not see an new button$/
+     * @Given /^I should not see a new button$/
      *
      */
     public function IDoNotSeeNew() {
