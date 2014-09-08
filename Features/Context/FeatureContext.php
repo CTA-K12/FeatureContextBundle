@@ -1807,6 +1807,81 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         }
     }
 
+
+    /**
+     *
+     *
+     * @Given /^I should see an edit button$/
+     *
+     */
+    public function ISeeEdit() {
+        $this->spin(
+            function( $context ) {
+                $element = $this->getSession()->getPage()->find( 'css' ,
+                    'span.fa-pencil:contains("Edit")'
+                );
+
+                return $element;
+            }
+        );
+    }
+
+    /**
+     *
+     *
+     * @Given /^I should not see an edit button$/
+     *
+     */
+    public function IDoNotSeeEdit() {
+        $this->spin(
+            function( $context ) {
+                $element = $this->getSession()->getPage()->find( 'css' ,
+                    'span.fa-pencil:contains("Edit")'
+                );
+
+                return !$element;
+            }
+        );
+    }
+
+        /**
+     *
+     *
+     * @Given /^I should see an new button$/
+     *
+     */
+    public function ISeeNew() {
+        $this->spin(
+            function( $context ) {
+                $element = $this->getSession()->getPage()->find( 'css' ,
+                    'span.fa-pencil:contains("New")'
+                );
+
+                return $element;
+            }
+        );
+    }
+
+    /**
+     *
+     *
+     * @Given /^I should not see an new button$/
+     *
+     */
+    public function IDoNotSeeNew() {
+        $this->spin(
+            function( $context ) {
+                $element = $this->getSession()->getPage()->find( 'css' ,
+                    'span.fa-plus:contains("New")'
+                );
+
+                return !$element;
+            }
+        );
+    }
+
+
+
     //
     // Place your definition and hook methods here:
     //
