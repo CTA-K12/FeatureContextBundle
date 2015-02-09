@@ -1588,6 +1588,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             'input#'.$field
         );
         $element->blur();
+        $this->IClickHeader();
     }
 
 
