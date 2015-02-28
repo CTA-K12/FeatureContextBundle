@@ -669,7 +669,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function ISavePlan( ) {
 
-        $save = $this->getSession()->getPage()->find( 'css', '#mesd_ormedbundle_plantype_submit_widget' );
+        $save = $this->getSession()->getPage()->find( 'css', '#mesd_ormedbundle_plantype_submit' );
         $save->focus();
         $save->click();
 
